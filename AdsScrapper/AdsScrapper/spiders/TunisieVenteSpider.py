@@ -56,14 +56,12 @@ class TunisieventespiderSpider(scrapy.Spider):
         text = re.sub(r'<br\s*?>', '\n', text)
 
 
-        
+
        # print("_____________________________")
         #print(text)
         now = datetime.datetime.now()
-
-        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
-        print(formatted_date)
-        
+        ScrapedDate = now.strftime("%d-%m-%Y %H:%M:%S") 
+        print(ScrapedDate) 
         url = response.meta['url']
         
         localisation = response.xpath('//tr[td/b[contains(text(), "Localisation")]]/td[2]//text()').getall()
@@ -78,6 +76,7 @@ class TunisieventespiderSpider(scrapy.Spider):
         image_urls = response.css('img.PhotoMin1::attr(src)').getall()
         match = re.search(r'(?<=cod_ann=)\d+', url)
         Code=0
+        
         if match:
             Code = match.group()
         

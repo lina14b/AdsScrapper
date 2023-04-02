@@ -32,8 +32,9 @@ class TpsspiderSpider(scrapy.Spider):
          print(link)
         
         next_page = response.css("a[aria-label=Next]::attr(href)").get()
-        #if next_page:
-         #   yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
+        if next_page:
+            yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
+            
     def parse_details(self, response):
        
          sel = Selector(response)
@@ -69,10 +70,9 @@ class TpsspiderSpider(scrapy.Spider):
          price = response.css('.cadre_prix_2::text').get().strip()
 
          now = datetime.datetime.now()
-
-         formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
-         print(formatted_date)
+         ScrapedDate = now.strftime("%d-%m-%Y %H:%M:%S")       
          
+         print(ScrapedDate)
          print(zone)
          print(code)
          print(status)
@@ -85,7 +85,6 @@ class TpsspiderSpider(scrapy.Spider):
          print(Nb_SalleBain)
          print(Nb_Couchage)
          print(image_urls)
-
          print(price)
 
 
