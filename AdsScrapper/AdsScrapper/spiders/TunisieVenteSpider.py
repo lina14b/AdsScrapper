@@ -5,30 +5,49 @@ from scrapy.http import Request
 from scrapy.settings import Settings
 import re
 import os
+from urllib.parse import urljoin
+import datetime
         
 class TunisieventespiderSpider(scrapy.Spider):
     name = "TunisieVenteSpider"
     allowed_domains = ["tunisie-vente.com"]
-    start_urls = ["http://www.tunisie-vente.com/ListeOffres.asp"]
+    start_urls = ["http://www.tunisie-vente.com/ListeOffres.asp?rech_cod_cat=1&rech_cod_rub=101&rech_cod_typ=10102&rech_cod_sou_typ=undefined&rech_cod_pay=&rech_cod_vil=undefined&rech_cod_loc=undefined&rech_prix_min=undefined&rech_prix_max=undefined&rech_surf_min=undefined&rech_surf_max=undefined&rech_order_by=undefined&rech_page_num=1"]
     base_url = "http://www.tunisie-vente.com/"
     
     custom_settings = {
-        'CLOSESPIDER_ITEMCOUNT': 3,  # set the maximum number of items to extract
-        'DOWNLOAD_DELAY': 10, # 10 seconds delay
+        
+        'DOWNLOAD_DELAY': 4, # 10 seconds delay
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
 
     }
 
     def parse(self, response):
-        # Extract the URLs of all the listings on the page
+        
         
         links = response.css('tr td.titre a::attr(href)').getall()
+        selector = response.xpath('//span[@class="lst_ann_titre_blue"]')
+        value = selector.css("::text").get().strip()
+        offres = int(re.search(r"\d+", value).group())
+        pages = round(offres // 10) 
+        
+        print(response.url)
+        
+        base,currentpage=response.url.split('rech_page_num=')
+        
+        print(currentpage)
+        nextpage = int(currentpage) + 1
+        next_page_url=base+'rech_page_num='+str(nextpage)
+
         for link in links:
          yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
+        
+        if nextpage<=pages:
+            yield scrapy.Request(url=urljoin(response.url, next_page_url), callback=self.parse)
 
 
     def parse_details(self, response):
+       
         # Extract the information from the listing page
         sel = Selector(response)
         text = response.xpath('//p[@align="justify"]/text()').extract()
@@ -36,8 +55,12 @@ class TunisieventespiderSpider(scrapy.Spider):
         # join the list of text fragments into a single string
         text = ''.join(text)
         text = re.sub(r'<br\s*?>', '\n', text)
-        print("_____________________________")
-        print(text)
+       # print("_____________________________")
+        #print(text)
+        now = datetime.datetime.now()
+
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
+        print(formatted_date)
         
         url = response.meta['url']
         
@@ -87,7 +110,7 @@ class TunisieventespiderSpider(scrapy.Spider):
         
 
         # define file path
-        file_path = "C:/Users/Lina/Desktop/AdsScrapper/AdsScrapper/my_data.csv"
+        file_path = "C:/Users/Lina/Desktop/AdsScrapper/AdsScrapper/TunisieVente.csv"
 
        
 
