@@ -50,11 +50,13 @@ class TunisieventespiderSpider(scrapy.Spider):
        
         # Extract the information from the listing page
         sel = Selector(response)
-        text = response.xpath('//p[@align="justify"]/text()').extract()
 
-        # join the list of text fragments into a single string
+        text = response.xpath('//p[@align="justify"]/text()').extract()
         text = ''.join(text)
         text = re.sub(r'<br\s*?>', '\n', text)
+
+
+        
        # print("_____________________________")
         #print(text)
         now = datetime.datetime.now()
