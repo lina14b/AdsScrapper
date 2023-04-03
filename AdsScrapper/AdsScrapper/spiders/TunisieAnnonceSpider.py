@@ -1,6 +1,7 @@
 import scrapy
 from urllib.parse import urljoin
 import datetime
+import pandas as pd
 
 
 class TunisieannoncespiderSpider(scrapy.Spider):
@@ -45,42 +46,28 @@ class TunisieannoncespiderSpider(scrapy.Spider):
        country=tdcontent[3]
        state=tdcontent[4]
        region=tdcontent[5]
-       ville=tdcontent[6]
-            
+       ville=tdcontent[6]            
        element = response.xpath('//td[@class="da_field_text" and @colspan="3"]/text()').getall()
        adress=element[6]
        surface=element[7]
        prix=element[8]
-       text = ' '.join(map(str, element[9:]))
-       
+       text = ' '.join(map(str, element[9:]))      
        dates = response.xpath('//td[@class="da_field_text"]/text()').getall()
        dateModification=dates[-1]
        dateInsertion=dates[-1]
        
        now = datetime.datetime.now()
        ScrapedDate = now.strftime("%d-%m-%y %H:%M:%S") 
-
-       print(ScrapedDate)   
-       print(response.url)
-       print(code)
-       print(country)
-       print(state)
-       print(region)
-       print(ville)
-       print(adress)
-       print(surface)
-       print(prix)
-       print(text)
-       print(dateInsertion)
-       print(dateModification)
-
-
        all_photos_div = response.css('#all_photos')
        img_src_list = []
        for photo_div in all_photos_div.css('div[id^="div_photo_"]'):
             img_src = photo_div.css('img::attr(src)').get()
             img_src_list.append("www.tunisie-annonce.com"+img_src)
-       print(img_src_list)
+
+       df = pd.DataFrame([{"url": response.url,'Code':code,"description": text,"adress":adress,"ville":ville,"region":region,
+            "state":state ,'country': country,'price': prix,"surface":surface,
+            "dateInsertion":dateInsertion,"dateModification":dateModification,'image_urls': img_src_list,'ScrapedDate':ScrapedDate            
+        }])
 
 
 

@@ -25,12 +25,9 @@ class TpsspiderSpider(scrapy.Spider):
     def parse(self, response):
         links = response.css("a.lien_interne::attr(href)").getall()
         
-        
-
         for link in links:
          yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
-         print(link)
-        
+    
         next_page = response.css("a[aria-label=Next]::attr(href)").get()
         if next_page:
             yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
@@ -66,98 +63,16 @@ class TpsspiderSpider(scrapy.Spider):
          Nb_Couchage = Nb_Couchage_li.xpath('.//mark[2]/text()').get()
          image_urls = response.css("div.main-carousel img::attr(src)").getall()
 
-
          price = response.css('.cadre_prix_2::text').get().strip()
 
          now = datetime.datetime.now()
          ScrapedDate = now.strftime("%d-%m-%Y %H:%M:%S")       
-         
-         print(ScrapedDate)
-         print(zone)
-         print(code)
-         print(status)
-         print(text)
-         print(characteristics)
-         print(superficie)
-         print(superficie_construite)
-         print(Nb_piece)
-         print(Nb_chambre)
-         print(Nb_SalleBain)
-         print(Nb_Couchage)
-         print(image_urls)
-         print(price)
 
-
-    #     text = response.xpath('//p[@align="justify"]/text()').extract()
-
-    #     # join the list of text fragments into a single string
-    #     text = ''.join(text)
-    #     text = re.sub(r'<br\s*?>', '\n', text)
-         print("_____________________________")
-    #     #print(text)
-        
          url = response.meta['url']
-      
-        
-    #     localisation = response.xpath('//tr[td/b[contains(text(), "Localisation")]]/td[2]//text()').getall()
-    #     adresse = response.xpath('//tr[td/b/text()="Adresse"]/td[3]/text()').get()
-    #     surface = response.xpath('//tr[td/b/text()="Surface"]/td[2]/text()').get()
-    #     price = response.xpath('//tr[td/b/text()="Prix"]/td[2]/text()').get()
-    #     # Extract table information
-    #     table = response.xpath('//table[@id="Table3"]//tr')
-    #     date_insertion = table.xpath('.//td/b[contains(text(), "Date Insertion")]/following-sibling::text()').get()
-    #     date_modification = table.xpath('.//td/b[contains(text(), "Date Modification")]/following-sibling::text()').get()
-    #     date_expiration = table.xpath('.//td/b[contains(text(), "Date Expiration")]/following-sibling::text()').get()
-    #     image_urls = response.css('img.PhotoMin1::attr(src)').getall()
-    #     match = re.search(r'(?<=cod_ann=)\d+', url)
-    #     Code=0
-    #     if match:
-    #         Code = match.group()
-        
 
-    #     yield {
-    #         'url': url,             
-    #         'description': text,
-    #         'localisation':localisation,
-    #         'adresse': surface,
-    #         'price': price,
-    #         'date_insertion':date_insertion,
-    #         'date_Modification': date_modification,
-    #         'date_Expiration': date_expiration,
-    #         'image_urls': image_urls,
-    #         'Code':Code
-    #      }
-        
-    #     # Save the extracted information to an Excel file
-    #     df = pd.DataFrame([{
-    #         "url": response.url,
-    #         "description": text,
-    #         "localisation":localisation,
-    #         'adresse': surface,
-    #         'price': price,
-    #         'date_insertion':date_insertion,
-    #         'date_Modification': date_modification,
-    #         'date_Expiration': date_expiration,
-    #         'image_urls': image_urls,
-    #         'Code':Code
+         df = pd.DataFrame([{"url": response.url,'Code':code,"description": text,"characteristics":characteristics,"localisation":zone,
+            "status":status ,'surface': superficie,'surface_construite': superficie_construite,'price': price,
+            "Nb_piece":Nb_piece,"Nb_chambre":Nb_chambre,"Nb_SalleBain":Nb_SalleBain,"Nb_Couchage":Nb_Couchage,
+            'image_urls': image_urls,'ScrapedDate':ScrapedDate
             
-    #     }])
-        
-
-    #     # define file path
-    #     file_path = "C:/Users/Lina/Desktop/AdsScrapper/AdsScrapper/TunisieVente.csv"
-
-       
-
-    #     # check if file exists, create it if it doesn't
-    #     if not os.path.exists(file_path):
-    #         df.to_csv(file_path, index=False)
-    #     else:
-    #         # read existing file into DataFrame
-    #         existing_df = pd.read_csv(file_path)
-            
-    #         # append new DataFrame to existing file
-    #         new_df = existing_df.append(df, ignore_index=True)
-    #         new_df.to_csv(file_path, index=False)
-
-
+        }])
