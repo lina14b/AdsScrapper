@@ -7,14 +7,17 @@ import re
 import os
 from urllib.parse import urljoin
 import datetime
-        
+import sys
+module_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_dir)
+from bienImmobilier import BienImmobilier
 class TunisieventespiderSpider(scrapy.Spider):
     name = "TunisieVenteSpider"
     allowed_domains = ["tunisie-vente.com"]
     start_urls = ["http://www.tunisie-vente.com/ListeOffres.asp?rech_cod_cat=1&rech_cod_rub=101&rech_cod_typ=10102&rech_cod_sou_typ=undefined&rech_cod_pay=&rech_cod_vil=undefined&rech_cod_loc=undefined&rech_prix_min=undefined&rech_prix_max=undefined&rech_surf_min=undefined&rech_surf_max=undefined&rech_order_by=undefined&rech_page_num=1"]
     base_url = "http://www.tunisie-vente.com/"  
     custom_settings = {       
-        'DOWNLOAD_DELAY': 4, # 10 seconds delay
+        'DOWNLOAD_DELAY': 1, # 10 seconds delay
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
     }
@@ -29,6 +32,8 @@ class TunisieventespiderSpider(scrapy.Spider):
         base,currentpage=response.url.split('rech_page_num=')
         nextpage = int(currentpage) + 1
         next_page_url=base+'rech_page_num='+str(nextpage)
+
+        print(links)
         
         #pour les annonces
         for link in links:
@@ -44,6 +49,7 @@ class TunisieventespiderSpider(scrapy.Spider):
         text = response.xpath('//p[@align="justify"]/text()').extract()
         text = ''.join(text)
         text = re.sub(r'<br\s*?>', '\n', text)
+        #print(text)
 
         now = datetime.datetime.now()
         ScrapedDate = now.strftime("%d-%m-%Y %H:%M:%S") 
@@ -51,7 +57,7 @@ class TunisieventespiderSpider(scrapy.Spider):
         url = response.meta['url']
         
         localisation = response.xpath('//tr[td/b[contains(text(), "Localisation")]]/td[2]//text()').getall()
-        adresse = response.xpath('//tr[td/b/text()="Adresse"]/td[3]/text()').get()
+        adresse = response.xpath('//tr[td/b/text()="Adresse"]/td[2]/text()').get()
         surface = response.xpath('//tr[td/b/text()="Surface"]/td[2]/text()').get()
         price = response.xpath('//tr[td/b/text()="Prix"]/td[2]/text()').get()
         
@@ -60,6 +66,11 @@ class TunisieventespiderSpider(scrapy.Spider):
         date_modification = table.xpath('.//td/b[contains(text(), "Date Modification")]/following-sibling::text()').get()
         date_expiration = table.xpath('.//td/b[contains(text(), "Date Expiration")]/following-sibling::text()').get()
         image_urls = response.css('img.PhotoMin1::attr(src)').getall()
+        img_src_list = []
+        for link in image_urls:
+           
+            img_src_list.append("www.tunisie-vente.com"+link)
+
         match = re.search(r'(?<=cod_ann=)\d+', url)
         Code=0        
         if match:
@@ -67,19 +78,21 @@ class TunisieventespiderSpider(scrapy.Spider):
 
         yield { 'url': url,'description': text,'localisation':localisation,
             'adresse': adresse,'surface':surface,'price': price,'date_insertion':date_insertion,'date_Modification': date_modification,
-            'date_Expiration': date_expiration,'image_urls': image_urls,'Code':Code
+            'date_Expiration': date_expiration,'image_urls': img_src_list,'Code':Code
          }
         
-        # transorm to dataframe 
-        df = pd.DataFrame([{"url": response.url,'Code':Code,"description": text,"localisation":localisation,'adresse': surface,'price': price,
-            'date_insertion':date_insertion,'date_Modification': date_modification,'date_Expiration': date_expiration,
-            'image_urls': image_urls   ,"ScrapedDate":ScrapedDate             
-        }])
-        print(df)
         
+        row = {"url": response.url,'Code':Code,"description": text,"localisation":localisation,'adresse': adresse,'surface': surface,'price': price,
+            'date_insertion':date_insertion,'date_Modification': date_modification,'date_Expiration': date_expiration,
+            'image_urls': img_src_list   ,"ScrapedDate":ScrapedDate             
+        }
+        b=BienImmobilier()
+        b.extractTunisieVente(row)
+        b.noneCheck()
+        b.print_maison()
 
         # # define file path
-        # file_path = "C:/Users/Lina/Desktop/AdsScrapper/AdsScrapper/TunisieVente.csv"
+        # file_path = "C:/Users/Lina/Desktop/TunisieVente.csv"
         # # check if file exists, create it if it doesn't
         # if not os.path.exists(file_path):
         #     df.to_csv(file_path, index=False)

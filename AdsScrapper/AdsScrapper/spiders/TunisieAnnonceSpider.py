@@ -2,6 +2,13 @@ import scrapy
 from urllib.parse import urljoin
 import datetime
 import pandas as pd
+import os
+import re
+import sys
+module_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_dir)
+from bienImmobilier import BienImmobilier
+
 
 
 class TunisieannoncespiderSpider(scrapy.Spider):
@@ -10,7 +17,7 @@ class TunisieannoncespiderSpider(scrapy.Spider):
     start_urls = ["http://www.tunisie-annonce.com/AnnoncesImmobilier.asp?rech_page_num=1&rech_cod_cat=1&rech_cod_rub=101&rech_cod_typ=10102&rech_cod_sou_typ=&rech_cod_pay=TN&rech_cod_reg=&rech_cod_vil=&rech_cod_loc=&rech_prix_min=&rech_prix_max=&rech_surf_min=&rech_surf_max=&rech_age=&rech_photo=&rech_typ_cli=&rech_order_by=11"]
     custom_settings = {
         
-        'DOWNLOAD_DELAY': 4, # 10 seconds delay
+        #'DOWNLOAD_DELAY': 4, # 10 seconds delay
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
 
@@ -38,6 +45,7 @@ class TunisieannoncespiderSpider(scrapy.Spider):
 
 
     def parse_details(self, response):
+       
        url=response.url
        s = url
        code = s.split("=")[1]
@@ -47,11 +55,16 @@ class TunisieannoncespiderSpider(scrapy.Spider):
        state=tdcontent[4]
        region=tdcontent[5]
        ville=tdcontent[6]            
-       element = response.xpath('//td[@class="da_field_text" and @colspan="3"]/text()').getall()
-       adress=element[6]
-       surface=element[7]
-       prix=element[8]
-       text = ' '.join(map(str, element[9:]))      
+       #element = response.xpath('//td[@class="da_field_text" and @colspan="3"]/text()').getall()
+       adress=response.xpath('//td[text()="Adresse"]/following-sibling::td/text()').get()
+       surface=response.xpath('//td[text()="Surface"]/following-sibling::td/text()').get()
+       prix=response.xpath('//td[text()="Prix"]/following-sibling::td/text()').get()
+
+       #text = ''.join(response.xpath('//td[text()="Texte"]/following-sibling::td//text()').getall()).strip()
+       text= '\n'.join(response.xpath('//td[text()="Texte"]/following-sibling::td//text()').getall()).replace('\n\n', '\n').strip()
+
+    
+       
        dates = response.xpath('//td[@class="da_field_text"]/text()').getall()
        dateModification=dates[-1]
        dateInsertion=dates[-1]
@@ -64,10 +77,18 @@ class TunisieannoncespiderSpider(scrapy.Spider):
             img_src = photo_div.css('img::attr(src)').get()
             img_src_list.append("www.tunisie-annonce.com"+img_src)
 
-       df = pd.DataFrame([{"url": response.url,'Code':code,"description": text,"adress":adress,"ville":ville,"region":region,
+       row = {"url": response.url,'Code':code,"description": text,"adresse":adress,"ville":ville,"region":region,
             "state":state ,'country': country,'price': prix,"surface":surface,
-            "dateInsertion":dateInsertion,"dateModification":dateModification,'image_urls': img_src_list,'ScrapedDate':ScrapedDate            
-        }])
+            "date_insertion":dateInsertion,"date_Modification":dateModification,'image_urls': img_src_list,'ScrapedDate':ScrapedDate            
+        }
+       
+       
+       b=BienImmobilier()
+       b.extractTA(row)
+       b.noneCheck()
+       b.print_maison()
+       
+       
 
 
 

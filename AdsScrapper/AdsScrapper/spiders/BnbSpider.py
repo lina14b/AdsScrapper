@@ -2,6 +2,11 @@ import scrapy
 from urllib.parse import urljoin
 import datetime
 import pandas as pd
+import os
+import sys
+module_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_dir)
+from bienImmobilier import BienImmobilier
 
 
 
@@ -40,10 +45,27 @@ class BnbspiderSpider(scrapy.Spider):
        location = response.xpath('//div[@class="property-detail-subtitle"]/div[1]/a/text()').extract_first()
        location = location.strip()
     
-       df = pd.DataFrame([{"url": response.url,'Code':code,"description": text,"localisation":location,
-            "status":status ,'surface': Surface,'surface_construite': Surfacelot,'price': price,
+       row ={"url": response.url,'Code':code,"description": text,"localisation":location,
+            "status":status ,'surface_totale': Surface,'surface_habitable': Surfacelot,'price': price,
             "Nb_chambre":Chambres,"Nb_SalleBain":Sallesbain,
             'image_urls': images,'ScrapedDate':ScrapedDate
             
-        }])
+        }
+       b=BienImmobilier()
+       b.extractBnb(row)
+       b.noneCheck()
+       b.print_maison()
+    #    # define file path
+    #    file_path = "C:/Users/Lina/Desktop/Bnb.csv"
+    #     # check if file exists, create it if it doesn't
+    #    if not os.path.exists(file_path):
+    #         df.to_csv(file_path, index=False)
+    #    else:
+    #         # read existing file into DataFrame
+    #         existing_df = pd.read_csv(file_path)
+            
+    #         # append new DataFrame to existing file
+    #         new_df = existing_df.append(df, ignore_index=True)
+    #         new_df.to_csv(file_path, index=False)
+       
 
