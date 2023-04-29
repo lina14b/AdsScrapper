@@ -7,7 +7,7 @@ import sys
 module_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(module_dir)
 from bienImmobilier import BienImmobilier
-
+import csv
 
 
 class BnbspiderSpider(scrapy.Spider):
@@ -19,10 +19,56 @@ class BnbspiderSpider(scrapy.Spider):
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
     }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        ######Condition d'arret
+        file_path=os.getcwd()+"/AdsScrapper/first_run.csv"
+        file_path = file_path.replace('/', '\\')
+        with open(file_path, 'r', newline='') as file:
+         first=True
+         reader = csv.reader(file)
+         for row in reader:
+            website, date = row
+            if website=="Bnb":
+               first=False                           
+        if first:
+            website = 'Bnb'
+            date = datetime.datetime.now().strftime('%Y-%m-%d')
+            with open(file_path, 'a', newline='') as file:
+             writer = csv.writer(file)
+             writer.writerow([website, date])
+        self.first_run = first
+     ####END
 
     def parse(self, response):       
         links = response.css('a.property-row-picture-target::attr(href)').extract()
-        for link in links:
+
+        ########################
+        Url_List=[]
+        if not self.first_run:
+         b=BienImmobilier()
+         count=0
+
+         for link in links:
+            path=response.urljoin(link)
+            
+            if b.ReadbyUrl(path):
+               count+=1
+               continue
+               
+            else:
+               Url_List.append(link)
+               
+        else: 
+           Url_List=links
+
+        if len(Url_List)==0 or count==10:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        #############################
+
+
+        for link in Url_List:
            yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
            
         next_page = response.xpath('//a[contains(@class, "next")]/@href').get()        
@@ -55,6 +101,7 @@ class BnbspiderSpider(scrapy.Spider):
        b.extractBnb(row)
        b.noneCheck()
        b.print_maison()
+       b.SaveDb(b)
     #    # define file path
     #    file_path = "C:/Users/Lina/Desktop/Bnb.csv"
     #     # check if file exists, create it if it doesn't

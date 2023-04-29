@@ -4,6 +4,7 @@ import datetime
 import re
 import pandas as pd
 import sys
+import csv
 module_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(module_dir)
 from bienImmobilier import BienImmobilier
@@ -22,11 +23,56 @@ class TunisiapromospiderSpider(scrapy.Spider):
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
 
     }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        ######Condition d'arret
+        file_path=os.getcwd()+"/AdsScrapper/first_run.csv"
+        file_path = file_path.replace('/', '\\')
+        with open(file_path, 'r', newline='') as file:
+         first=True
+         reader = csv.reader(file)
+         for row in reader:
+            website, date = row
+            if website=="TP":
+               first=False                           
+        if first:
+            website = 'TP'
+            date = datetime.datetime.now().strftime('%Y-%m-%d')
+            with open(file_path, 'a', newline='') as file:
+             writer = csv.writer(file)
+             writer.writerow([website, date])
+        self.first_run = first
+     ####END
+    
 
     def parse(self, response):
+        links=response.css('a.headline::attr(href)').getall()
+        # ########################
+        Url_List=[]
+        if not self.first_run:
+         b=BienImmobilier()
+         count=0
+
+         for link in links:
+            path=response.urljoin(link)
+            
+            if b.ReadbyUrl(path):
+               count+=1
+               continue
+               
+            else:
+               Url_List.append(link)
+               
+        else: 
+           Url_List=links
+
+        if len(Url_List)==0 or count==5:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        #############################
         
-        for job in response.css('a.headline::attr(href)').getall():
-            yield response.follow(job, self.parse_listing)
+        for job in Url_List:
+           yield response.follow(job, self.parse_listing)
 
         next_page = response.css("p a:contains('Suivant')::attr(href)").get()
         if next_page is not None:
@@ -97,6 +143,7 @@ class TunisiapromospiderSpider(scrapy.Spider):
         b.extractTunisiePromo(row)
         b.noneCheck()
         b.print_maison()
+        b.SaveDb(b)
          
 
         # # define file path
