@@ -18,7 +18,7 @@ class TunisieannoncespiderSpider(scrapy.Spider):
     start_urls = ["http://www.tunisie-annonce.com/AnnoncesImmobilier.asp?rech_page_num=1&rech_cod_cat=1&rech_cod_rub=101&rech_cod_typ=10102&rech_cod_sou_typ=&rech_cod_pay=TN&rech_cod_reg=&rech_cod_vil=&rech_cod_loc=&rech_prix_min=&rech_prix_max=&rech_surf_min=&rech_surf_max=&rech_age=&rech_photo=&rech_typ_cli=&rech_order_by=11"]
     custom_settings = {
         
-        'DOWNLOAD_DELAY': 4, # 10 seconds delay
+        'DOWNLOAD_DELAY': 1, # 10 seconds delay
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
 
@@ -53,11 +53,8 @@ class TunisieannoncespiderSpider(scrapy.Spider):
 
         Url_List=[]
         count=0
-        if not self.first_run:
-         b=BienImmobilier()
-         
-
-         for link in links:
+        b=BienImmobilier()
+        for link in links:
             path=response.urljoin(link)
             
             if b.ReadbyUrl(path):
@@ -67,10 +64,10 @@ class TunisieannoncespiderSpider(scrapy.Spider):
             else:
                Url_List.append(link)
                
-        else: 
-           Url_List=links
-
-        if len(Url_List)==0 or count==25:
+        
+        print("\n\n\n")
+        print(count)
+        if len(Url_List)==0 or count>=24:
            raise scrapy.exceptions.CloseSpider("no more links to scrap")
         ############
 
