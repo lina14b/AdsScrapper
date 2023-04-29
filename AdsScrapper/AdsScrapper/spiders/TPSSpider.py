@@ -51,9 +51,10 @@ class TpsspiderSpider(scrapy.Spider):
         links = response.css("a.lien_interne::attr(href)").getall()
         # ########################
         Url_List=[]
+        count=0
         if not self.first_run:
          b=BienImmobilier()
-         count=0
+         
 
          for link in links:
             path=response.urljoin(link)

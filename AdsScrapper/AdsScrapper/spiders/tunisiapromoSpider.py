@@ -18,7 +18,7 @@ class TunisiapromospiderSpider(scrapy.Spider):
     ]
     custom_settings = {
         
-        'DOWNLOAD_DELAY': 4, # 10 seconds delay
+        'DOWNLOAD_DELAY': 2, # 10 seconds delay
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
 
@@ -50,9 +50,10 @@ class TunisiapromospiderSpider(scrapy.Spider):
         links=response.css('a.headline::attr(href)').getall()
         # ########################
         Url_List=[]
+        count=0
         if not self.first_run:
          b=BienImmobilier()
-         count=0
+         
 
          for link in links:
             path=response.urljoin(link)

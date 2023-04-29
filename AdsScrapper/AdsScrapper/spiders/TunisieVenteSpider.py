@@ -59,9 +59,10 @@ class TunisieventespiderSpider(scrapy.Spider):
         next_page_url=base+'rech_page_num='+str(nextpage)
         ########################
         Url_List=[]
+        count=0
         if not self.first_run:
          b=BienImmobilier()
-         count=0
+         
 
          for link in links:
             path="http://www.tunisie-vente.com/"+link
