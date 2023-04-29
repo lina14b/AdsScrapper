@@ -564,53 +564,53 @@ class BienImmobilier:
         for result in datas:
             BI=BienImmobilier()
            
-            if result['website']:
+            if 'website' in result:
              BI.website = result['website']
-            if result['url']:
+            if 'url'in result:
              BI.url = result['url']
-            if result['code']:
+            if 'code'in result:
              BI.code = result['code']
-            if result['description']:
+            if 'description'in result:
              BI.description = result['description']
-            if result['price']:
+            if 'price'in result:
              BI.price = result['price']
-            if result['surfaceTotale']:
+            if 'surfaceTotale'in result:
              BI.surfaceTotale = result['surfaceTotale']
-            if result['surface_habitable']:
+            if 'surface_habitable'in result:
              BI.surface_habitable = result['surface_habitable']
-            if result['adresse']:
+            if 'adresse'in result:
              BI.adresse = result['adresse']
-            if result['country']:
+            if 'country'in result:
              BI.country = result['country']
-            if result['state']:
+            if 'state'in result:
              BI.state = result['state']
-            if result['zone']:
+            if 'zone'in result:
              BI.zone = result['zone']
-            if result['ville']:
+            if 'ville'in result:
              BI.ville = result['ville']
-            if result['etage']:
+            if 'etage'in result:
              BI.etage = result['etage']
-            if result['place_voiture']:
+            if 'place_voiture'in result:
              BI.place_voiture = result['place_voiture']
-            if result['characteristicslist']:
+            if 'characteristicslist'in result:
              BI.characteristicslist = result['characteristicslist']
-            if result['nombre_de_chambre']:
+            if 'nombre_de_chambre'in result:
              BI.nombre_de_chambre = result['nombre_de_chambre']
-            if result['nombre_de_piece']:
+            if 'nombre_de_piece'in result:
              BI.nombre_de_piece = result['nombre_de_piece']
-            if result['nombre_de_salle_de_bain']:
+            if 'nombre_de_salle_de_bain'in result:
              BI.nombre_de_salle_de_bain = result['nombre_de_salle_de_bain']
-            if result['datescraped']:
+            if 'datescraped'in result:
              BI.datescraped = result['datescraped']
-            if result['dateinstered']:
+            if 'dateinstered'in result:
              BI.dateinstered = result['dateinstered']
-            if result['datemodified']:
+            if 'datemodified'in result:
              BI.datemodified = result['datemodified']
-            if result['imagesurlslist']:
+            if 'imagesurlslist'in result:
              BI.imagesurlslist = result['imagesurlslist']
-            if result['anneeconstruction']:
+            if 'anneeconstruction'in result:
              BI.anneeconstruction = result['anneeconstruction']
-            if result['TotalDescp']:
+            if 'TotalDescp'in result:
              BI.TotalDescp=result['TotalDescp']
             ListAll.append(BI, ignore_index=True)
         
