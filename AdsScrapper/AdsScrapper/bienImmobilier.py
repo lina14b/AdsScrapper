@@ -1,10 +1,16 @@
 import re
 from datetime import datetime
 from pymongo import MongoClient
+from datetime import datetime, timedelta
+
 
 
 
 class BienImmobilier:
+    client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+    db = client["AdsScrappers"]
+    collection = db["Ads"]
+    collectionH = db["AdsHistorisation"]
     def __init__(self):
         self.website = None
         self.url = None
@@ -437,8 +443,7 @@ class BienImmobilier:
         else:
          self.anneeconstruction=int(self.anneeconstruction, 10)
 
-        if not self.total_description :
-         self.TotalDescp=None
+        self.total_description()
 
     def SaveDb(self,BI):
      # Set up a MongoDB client to connect to your Atlas cluster
@@ -479,10 +484,10 @@ class BienImmobilier:
             if 'website' in result:
              self.website = result['website']
 
-            if result['url'] in result:
+            if 'url' in result:
              self.url = result['url']
 
-            if result['code'] in result:
+            if 'code' in result:
              self.code = result['code']
 
             if result['description']in result:
@@ -545,8 +550,8 @@ class BienImmobilier:
             if  'anneeconstruction'in result:
              self.anneeconstruction = result['anneeconstruction']
 
-            if  'TotalDescp'in result:
-             self.TotalDescp=result['TotalDescp']
+            if  'total_description'in result:
+             self.TotalDescp=result['total_description']
             return True          
         else:
             return False 
@@ -610,7 +615,100 @@ class BienImmobilier:
              BI.imagesurlslist = result['imagesurlslist']
             if 'anneeconstruction'in result:
              BI.anneeconstruction = result['anneeconstruction']
-            if 'TotalDescp'in result:
-             BI.TotalDescp=result['TotalDescp']
-            ListAll.append(BI, ignore_index=True)
+            if 'total_description'in result:
+             BI.TotalDescp=result['total_description']
+            ListAll.append(BI.__dict__)
+
+        return ListAll 
+    
+    
+    def readAll_TA_TV(self):
+        client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        db = client["AdsScrappers"]
+        collection = db["Ads"]
+        query = {"$or": [{"website": "tunisie-vente.com"}, {"website": "tunisie-annonce.com"}]}
         
+        cursor = collection.find({})
+        datas = list(cursor)
+        ListAll=[]
+
+
+        for result in datas:
+            BI=BienImmobilier()
+           
+            if 'website' in result:
+             BI.website = result['website']
+            if 'url'in result:
+             BI.url = result['url']
+            if 'code'in result:
+             BI.code = result['code']
+            if 'description'in result:
+             BI.description = result['description']
+            if 'price'in result:
+             BI.price = result['price']
+            if 'surfaceTotale'in result:
+             BI.surfaceTotale = result['surfaceTotale']
+            if 'surface_habitable'in result:
+             BI.surface_habitable = result['surface_habitable']
+            if 'adresse'in result:
+             BI.adresse = result['adresse']
+            if 'country'in result:
+             BI.country = result['country']
+            if 'state'in result:
+             BI.state = result['state']
+            if 'zone'in result:
+             BI.zone = result['zone']
+            if 'ville'in result:
+             BI.ville = result['ville']
+            if 'etage'in result:
+             BI.etage = result['etage']
+            if 'place_voiture'in result:
+             BI.place_voiture = result['place_voiture']
+            if 'characteristicslist'in result:
+             BI.characteristicslist = result['characteristicslist']
+            if 'nombre_de_chambre'in result:
+             BI.nombre_de_chambre = result['nombre_de_chambre']
+            if 'nombre_de_piece'in result:
+             BI.nombre_de_piece = result['nombre_de_piece']
+            if 'nombre_de_salle_de_bain'in result:
+             BI.nombre_de_salle_de_bain = result['nombre_de_salle_de_bain']
+            if 'datescraped'in result:
+             BI.datescraped = result['datescraped']
+            if 'dateinstered'in result:
+             BI.dateinstered = result['dateinstered']
+            if 'datemodified'in result:
+             BI.datemodified = result['datemodified']
+            if 'imagesurlslist'in result:
+             BI.imagesurlslist = result['imagesurlslist']
+            if 'anneeconstruction'in result:
+             BI.anneeconstruction = result['anneeconstruction']
+            if 'total_description'in result:
+             BI.TotalDescp=result['total_description']
+            ListAll.append(BI.__dict__)
+
+        return ListAll 
+
+    def deleteduplicate_Ta_TV(self):
+      client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+      db = client["AdsScrappers"]
+      collection = db["Ads"]
+      delete_result = collection.delete_many({"code": self.code, "website": self.website})
+      return delete_result.deleted_count
+    
+    def deleteduplicate_Historisation(self):
+      # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+      # db = client["AdsScrappers"]
+      # collection = db["AdsHistorisation"]
+      delete_result = self.collectionH.delete_one({"code": self.code})
+      return delete_result.deleted_count
+    
+    def Readtest(self,code):      
+        result = self.collection.find_one({'code': code})
+        return result['code']
+    
+    def Delete_6months(self):
+      three_months_ago = datetime.utcnow() - timedelta(days=90)
+      delete_result = self.collection.delete_many({"dateinstered": {"$lt": three_months_ago}})
+      return delete_result.deleted_count
+    
+      
