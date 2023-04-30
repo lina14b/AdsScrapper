@@ -1,5 +1,5 @@
 import subprocess
-
+import os
 # Run spiders 1, 2, and 3 in parallel
 bnb=subprocess.Popen(['scrapy', 'crawl', 'BnbSpider'])
 tps=subprocess.Popen(['scrapy', 'crawl', 'TPSSpider'])
@@ -15,4 +15,9 @@ tA.wait()
 TV=subprocess.Popen(['scrapy', 'crawl', 'TunisieVenteSpider'])
 TV.wait()
 # Run last.py
-subprocess.Popen(['python', 'C:\\Users\\Lina\\Desktop\\AdsScrapper\\AdsScrapper\\AdsScrapper\\AdsScrapper\\updatingDB.py'])
+file_path=os.getcwd()
+file_path = file_path.replace('/', '\\')
+print(file_path)
+subprocess.Popen(['python',file_path+'\\AdsScrapper\\updatingDB.py'])
+print("\n \n end.. close the tab")
+
