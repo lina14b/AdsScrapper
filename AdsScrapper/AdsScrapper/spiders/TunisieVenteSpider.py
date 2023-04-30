@@ -60,31 +60,48 @@ class TunisieventespiderSpider(scrapy.Spider):
         ########################
         Url_List=[]
         count=0
-        if not self.first_run:
-         b=BienImmobilier()
+         
+        b=BienImmobilier()
          
 
-         for link in links:
+        for link in links:
             path="http://www.tunisie-vente.com/"+link
             path=path.replace(" ","")
+            ############3
+            match = re.search(r'(?<=cod_ann=)\d+', path)
+            code=0
+            Ncode=0        
+            if match:
+                code = match.group() 
+            code=code.replace(" ", "")
+            if code:
+             Ncode=int(code, 10)
+             print(Ncode)
             
             if b.ReadbyUrl(path):
-               count+=1
+               count=count+1
+               print(count)
                continue
                #raise scrapy.exceptions.CloseSpider("some_reason")
+            elif b.FindOneTA_TV(Ncode,"tunisie-annonce.com"):
+               count=count+1
+               print(count)
+               continue               
             else:
                Url_List.append(link)
-               
-        else: 
-           Url_List=links
+        
 
-        if len(Url_List)==0 or count==10:
-           raise scrapy.exceptions.CloseSpider("no more links to scrap")
-        #############################
+        
         
         for link in Url_List:
          yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
         
+        print(len(Url_List))
+        print(count)
+        if len(Url_List)==0 or count>=7:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        #############################
+       
         if nextpage<=pages:
             yield scrapy.Request(url=urljoin(response.url, next_page_url), callback=self.parse)
 
@@ -132,6 +149,8 @@ class TunisieventespiderSpider(scrapy.Spider):
             'date_insertion':date_insertion,'date_Modification': date_modification,'date_Expiration': date_expiration,
             'image_urls': img_src_list   ,"ScrapedDate":ScrapedDate             
         }
+        
+
         b=BienImmobilier()
         b.extractTunisieVente(row)
         b.noneCheck()

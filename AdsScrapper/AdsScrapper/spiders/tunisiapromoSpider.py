@@ -68,12 +68,14 @@ class TunisiapromospiderSpider(scrapy.Spider):
         else: 
            Url_List=links
 
-        if len(Url_List)==0 or count==5:
-           raise scrapy.exceptions.CloseSpider("no more links to scrap")
-        #############################
+        
         
         for job in Url_List:
            yield response.follow(job, self.parse_listing)
+
+        if len(Url_List)==0 or count>=4:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        #############################
 
         next_page = response.css("p a:contains('Suivant')::attr(href)").get()
         if next_page is not None:

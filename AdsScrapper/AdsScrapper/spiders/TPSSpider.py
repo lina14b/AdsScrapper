@@ -69,12 +69,14 @@ class TpsspiderSpider(scrapy.Spider):
         else: 
            Url_List=links
 
-        if len(Url_List)==0 or count==16:
-           raise scrapy.exceptions.CloseSpider("no more links to scrap")
-        #############################
+        
         
         for link in Url_List:
          yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
+
+        if len(Url_List)==0 or count>=15:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        #############################
     
         next_page = response.css("a[aria-label=Next]::attr(href)").get()
       #   print(response.url)

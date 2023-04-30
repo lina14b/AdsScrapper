@@ -53,12 +53,24 @@ class TunisieannoncespiderSpider(scrapy.Spider):
 
         Url_List=[]
         count=0
+        Ncode=0
         b=BienImmobilier()
+        print(links)
         for link in links:
             path=response.urljoin(link)
-            
+            s=link
+            print(path)
+            code = s.split("=")[-1]
+            print(s.split("="))
+            code=code.replace(" ", "")
+            if code:
+             Ncode=int(code, 10)
+
             if b.ReadbyUrl(path):
                count+=1
+               continue
+
+            elif b.FindOneTA_TV(Ncode,"tunisie-vente.com"):
                continue
                
             else:
@@ -67,15 +79,15 @@ class TunisieannoncespiderSpider(scrapy.Spider):
         
         print("\n\n\n")
         print(count)
-        if len(Url_List)==0 or count>=24:
-           raise scrapy.exceptions.CloseSpider("no more links to scrap")
-        ############
+        
 
         for link in Url_List:
            if "DetailsAnnonceImmobilier" in link:
              yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
 
-        
+        if len(Url_List)==0 or count>=20:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        ############
         tds = response.css('td[width="40"]')  
         fourth_td = tds[3]   
         href = fourth_td.css('a::attr(href)').get()   

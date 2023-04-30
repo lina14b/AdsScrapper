@@ -338,28 +338,29 @@ class BienImmobilier:
         print("Date Modified:", self.datemodified)
         print("Image URLs:", self.imagesurlslist)
         print("Construction Year:", self.anneeconstruction)
-        print("total:",self.total_description)
+        print("total:",self.TotalDescp)
     
     def total_description(self):
-       self.total_description=""
+       self.TotalDescp=" "
        if self.description:
-        self.total_description=self.total_description+self.description+" "
+        self.TotalDescp=self.TotalDescp+self.description+" "
+        print(self.description)
+        print(self.TotalDescp)
+        print("\n\n\n\n\n\n\n\n*********************************************")
 
        if self.adresse:
-        self.total_description=self.total_description+self.adresse+" "
+        self.TotalDescp=self.TotalDescp+self.adresse+" "
 
        if self.country:
-        self.total_description=self.total_description+self.country+" "
+        self.TotalDescp=self.TotalDescp+self.country+" "
        if self.state:
-        self.total_description=self.total_description+self.state+" "
+        self.TotalDescp=self.TotalDescp+self.state+" "
        if self.zone:
-        self.total_description=self.total_description+self.zone+" "
+        self.TotalDescp=self.TotalDescp+self.zone+" "
        if self.ville:
-        self.total_description=self.total_description+self.ville
-    
-      
+        self.TotalDescp=self.TotalDescp+self.ville
        for character in self.characteristicslist:
-        self.total_description=self.total_description+" "+character+" "
+        self.TotalDescp=self.TotalDescp+" "+character+" "
  
     def noneCheck(self):
         if not self.website or self.website.isspace():
@@ -442,18 +443,18 @@ class BienImmobilier:
          self.anneeconstruction = None
         else:
          self.anneeconstruction=int(self.anneeconstruction, 10)
-
-        self.total_description()
+        #self.TotalDescp=" "
+        #self.total_description()
 
     def SaveDb(self,BI):
      # Set up a MongoDB client to connect to your Atlas cluster
-      client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-      # Access a database and a collection
-      db = client["AdsScrappers"]
-      collection = db["Ads"]
+      # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+      # # Access a database and a collection
+      # db = client["AdsScrappers"]
+      # collection = db["Ads"]
       property_dict = BI.__dict__
       filtered_dict = {k: v for k, v in property_dict.items() if v is not None}
-      result = collection.insert_one(filtered_dict)
+      result = self.collection.insert_one(filtered_dict)
       self.SaveDb_Historisation()
     
     def SaveDb_Historisation(self):
@@ -467,19 +468,19 @@ class BienImmobilier:
         BI.surfaceTotale=self.surfaceTotale
         BI.characteristicslist=None
         BI.imagesurlslist=None
-        client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-        db = client["AdsScrappers"]
-        collection = db["AdsHistorisation"]
+        # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        # db = client["AdsScrappers"]
+        # collection = db["AdsHistorisation"]
         property_dict = BI.__dict__
         filtered_dict = {k: v for k, v in property_dict.items() if v is not None}
-        result = collection.insert_one(filtered_dict)
+        result = self.collectionH.insert_one(filtered_dict)
       
   
     def ReadbyUrl(self,url):
-        client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-        db = client["AdsScrappers"]
-        collection = db["Ads"]
-        result = collection.find_one({'url': url})
+        # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        # db = client["AdsScrappers"]
+        # collection = db["Ads"]
+        result = self.collection.find_one({'url': url})
         if result:
             if 'website' in result:
              self.website = result['website']
@@ -558,10 +559,10 @@ class BienImmobilier:
 
 
     def readAll(self):
-        client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-        db = client["AdsScrappers"]
-        collection = db["Ads"]
-        cursor = collection.find({})
+        # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        # db = client["AdsScrappers"]
+        # collection = db["Ads"]
+        cursor = self.collection.find({})
         datas = list(cursor)
         ListAll=[]
 
@@ -623,12 +624,12 @@ class BienImmobilier:
     
     
     def readAll_TA_TV(self):
-        client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-        db = client["AdsScrappers"]
-        collection = db["Ads"]
+        # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        # db = client["AdsScrappers"]
+        # collection = db["Ads"]
         query = {"$or": [{"website": "tunisie-vente.com"}, {"website": "tunisie-annonce.com"}]}
         
-        cursor = collection.find({})
+        cursor = self.collection.find(query)
         datas = list(cursor)
         ListAll=[]
 
@@ -689,10 +690,10 @@ class BienImmobilier:
         return ListAll 
 
     def deleteduplicate_Ta_TV(self):
-      client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-      db = client["AdsScrappers"]
-      collection = db["Ads"]
-      delete_result = collection.delete_many({"code": self.code, "website": self.website})
+      # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+      # db = client["AdsScrappers"]
+      # collection = db["Ads"]
+      delete_result = self.collection.delete_many({"code": self.code, "website": self.website})
       return delete_result.deleted_count
     
     def deleteduplicate_Historisation(self):
@@ -711,4 +712,12 @@ class BienImmobilier:
       delete_result = self.collection.delete_many({"dateinstered": {"$lt": three_months_ago}})
       return delete_result.deleted_count
     
+    def FindOneTA_TV(self,code,web):     
+      query = {"code": code, "website": web}
+      result = self.collection.find_one(query)
+
+      if result:
+          return True
+      else:
+          return False
       

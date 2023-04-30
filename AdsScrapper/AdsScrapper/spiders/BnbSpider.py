@@ -64,14 +64,16 @@ class BnbspiderSpider(scrapy.Spider):
         else: 
            Url_List=links
 
-        if len(Url_List)==0 or count==10:
-           raise scrapy.exceptions.CloseSpider("no more links to scrap")
-        #############################
+        
 
 
         for link in Url_List:
            yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
-           
+        
+        if len(Url_List)==0 or count>=9:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        #############################
+
         next_page = response.xpath('//a[contains(@class, "next")]/@href').get()        
         if next_page:
           yield scrapy.Request(url=urljoin(response.url, next_page), callback=self.parse)
