@@ -491,7 +491,7 @@ class BienImmobilier:
             if 'code' in result:
              self.code = result['code']
 
-            if result['description']in result:
+            if 'description'in result:
              self.description = result['description']
 
             if 'price'in result:
@@ -720,4 +720,76 @@ class BienImmobilier:
           return True
       else:
           return False
-      
+    
+    
+    def readAllOneMonth(self):
+        
+        one_month_ago = datetime.utcnow() - timedelta(days=30)
+
+        # Create query to find documents with date_inserted field greater than or equal to one month ago
+        query = {"dateinstered": {"$gte": one_month_ago}}
+
+        # Sort documents in descending order by date_inserted and retrieve the most recent document
+        cursor = self.collection.find(query)
+
+        #cursor = self.collection.find({})
+        datas = list(cursor)
+        ListAll=[]
+
+
+        for result in datas:
+            BI=BienImmobilier()
+           
+            if 'website' in result:
+             BI.website = result['website']
+            if 'url'in result:
+             BI.url = result['url']
+            if 'code'in result:
+             BI.code = result['code']
+            if 'description'in result:
+             BI.description = result['description']
+            if 'price'in result:
+             BI.price = result['price']
+            if 'surfaceTotale'in result:
+             BI.surfaceTotale = result['surfaceTotale']
+            if 'surface_habitable'in result:
+             BI.surface_habitable = result['surface_habitable']
+            if 'adresse'in result:
+             BI.adresse = result['adresse']
+            if 'country'in result:
+             BI.country = result['country']
+            if 'state'in result:
+             BI.state = result['state']
+            if 'zone'in result:
+             BI.zone = result['zone']
+            if 'ville'in result:
+             BI.ville = result['ville']
+            if 'etage'in result:
+             BI.etage = result['etage']
+            if 'place_voiture'in result:
+             BI.place_voiture = result['place_voiture']
+            if 'characteristicslist'in result:
+             BI.characteristicslist = result['characteristicslist']
+            if 'nombre_de_chambre'in result:
+             BI.nombre_de_chambre = result['nombre_de_chambre']
+            if 'nombre_de_piece'in result:
+             BI.nombre_de_piece = result['nombre_de_piece']
+            if 'nombre_de_salle_de_bain'in result:
+             BI.nombre_de_salle_de_bain = result['nombre_de_salle_de_bain']
+            if 'datescraped'in result:
+             BI.datescraped = result['datescraped']
+            if 'dateinstered'in result:
+             BI.dateinstered = result['dateinstered']
+            if 'datemodified'in result:
+             BI.datemodified = result['datemodified']
+            if 'imagesurlslist'in result:
+             BI.imagesurlslist = result['imagesurlslist']
+            if 'anneeconstruction'in result:
+             BI.anneeconstruction = result['anneeconstruction']
+            if 'total_description'in result:
+             BI.TotalDescp=result['total_description']
+            ListAll.append(BI.__dict__)
+
+        return ListAll 
+    
+    

@@ -29,4 +29,4 @@ for group in counts_list:
 print("deleted dups:",deletedups)
 #######Delete date annonce > 3mois
 Deleteitems=b.Delete_6months()
-print(Deleteitems)
+print("old items Deleted: ",Deleteitems)

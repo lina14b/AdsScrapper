@@ -18,6 +18,7 @@ TV.wait()
 file_path=os.getcwd()
 file_path = file_path.replace('/', '\\')
 print(file_path)
-subprocess.Popen(['python',file_path+'\\AdsScrapper\\updatingDB.py'])
+update=subprocess.Popen(['python',file_path+'\\AdsScrapper\\updatingDB.py'])
+update.wait()
 print("\n \n end.. close the tab")
 
