@@ -48,101 +48,18 @@
      
       <div id="bot" class="container-lg" style="margin-top:20px ;"class="row">
         <div class="card-deck">
+          {% for item in data %}
           <div id="im0" class="col-4">
-            <img src="Les images/Capture.PNG" class="card-img-top" style="height:195px;width: 350px; " alt="Appartement s4 ">
+            <img src="http://{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="Appartement s4 ">
+
             <div class="card-body">
-              <h5 class="card-title">Appartement s4 </h5>
-              <p class="card-text">appartement S4 au deuxième étage d’une résidence gardée Marina yassmine hammamet
-                L’appartement se compose comme suit :
-                Salon, suite parental, 3 grandes chambres à coucher, cuisine et trois salle de bain
-                Avec une belle vue dégagée sur Canal et mer.
-                superficie :150m²
-                prix 670.000dt
-                </p>
-                <a href="https://www.mubawab.tn/fr/a/7566586/appartement-s4-marina-yassmine-hammamet" class="Carte">Carte</a>
-
+              <p class="card-text"> {{item.description|safe}}</p>
+                <a href="{{item.url}}" class="Carte">Consulter</a>
             </div>
-            
           </div>
-
-
-          <div id="im1" class="col-4">
-            <img src="Les images/Capture2.PNG" class="card-img-top" style="height:195px;width: 350px; "  alt="Duplex Haut standing">
-            <div class="card-body">
-              <h5 class="card-title">Duplex Haut standing</h5>
-              <p class="card-text">Le duplex est situé au rez de chaussé dans une Résidence gardée et clôturée à 400m de la plage, il est composé d’un salon, salle à manger, suite parentale, 03 chambres, cuisine, 02 salle de bain, salle d’eau, séchoir et terrasse couverte, terrasse découverte et jardin
-                */Surface totale : 288 m²
-                */Surface jardin : 42 m²
-                */Surface terrasse découverte : 30m²</p>
-                <a href="https://www.mubawab.tn/fr/pa/7028757/duplex-haut-standing" class="Carte">Carte</a>
-
-            </div>
-           
-          </div>
-
-          <div id="im2" class="col-4">
-            <img src="Les images/Capture3.PNG" class="card-img-top" style="height:195px;width: 350px; " alt="S2 avec une grande Terrasse et 3 orientations">
-            <div class="card-body">
-              <h5> S2 avec une grande Terrasse et 3 orientations </h5>
-              <p class="card-text">My House située à Chotrana 1 La Soukra à proximité de toutes commodités Carrefour Market, Pharmacie.Ce coquet appartement est composé de 2 chambres à coucher dont une suite parentale , un salon lumineux,une cuisine bien équipée et une grande terrasse de 49.4 M2
-                La surface de l'appartement hors terrase est de 97.54 M2</p>
-                <a href="https://www.mubawab.tn/fr/pa/7591835/s2-avec-une-grande-terrasse-et-3-orientations" class="Carte">Carte</a>
-
-            </div>
-            
-          </div>
-
-          <div id="im3" class="col-4">
-            <img src="Les images/Capture4.PNG" class="card-img-top" style="height:195px;width: 350px; " alt="Un Coquet S2">
-            <div class="card-body">
-              <h5 class="card-title">Un Coquet S2</h5>
-              <p class="card-text">Un spacieux S2 composé d'une partie jour avec un salon avec balcon, une cuisine agencée et équipée, ainsi que d'un séchoir, et une partie nuit composée de 2 chambres à coucher dont une avec dressing, une salle d'eau et une salle de bain commune.
-            </p>
-            <a href="https://www.mubawab.tn/fr/pa/7599336/un-coquet-s2-jamais-habit%C3%A9" class="Carte">Carte</a>
-
-            </div>
-            
-          </div>
-            <div id="im4" class="col-4">
-              <img src="Les images/Capture5.PNG" class="card-img-top" style="height:195px;width: 350px; " alt="Penthouse en S4 avec piscine">
-              <div class="card-body">
-                <h5 class="card-title">Penthouse en S4 avec piscine</h5>
-                <p class="card-text">un penthouse prestigieux en S4 neuf jamais habité aux Jardins de Carthage.
-                    Situé dans une résidence calme et sécurisé, positionné au dernier étage profitant d'un grand espace et une belle vue.
-                    Un grand salon donnant sur la terrasse et la piscine.
-                    Une salle d'eau invités.
-                    Une cuisine équipée.
-                </p>
-                <a href="https://www.mubawab.tn/fr/a/7678036/a-vendre-penthouse-en-s4-avec-piscine-aux-jardins-de-carthage" class="Carte">Carte</a>
-
-              </div>
-              
-            </div>
-            <div id="im5"class="col-4">
-              <img src="Les images/Capture6.PNG" class="card-img-top" style="height:195px;width: 350px; " alt="Appartement S2 ">
-              <div class="card-body">
-                <h5 class="card-title">Appartement S2</h5>
-                <p class="card-text">Emplacement : La Marsa 
-                    Superficie : 120 m² 
-                    Typologie : S2 
-                    État : vide
-                    Étage : Rez de chaussée 
-                    
-                    Composition : 
-                    Un salon avec terrasse
-                    Une cuisine équipée de hotte, plaque et four 
-                    Une salle d'eau 
-                    Deux chambres à coucher avec dressings 
-                    Une salle de bain 
-                </p>
-                <a href="https://www.mubawab.tn/fr/a/7674103/appartement-s2-avec-jardin-%C3%A0-la-marsa" class="Carte">Carte</a>
-
-              </div>
-             
-            </div>
+          {% endfor %}
         </div>
-        
-        
-       
+      </div>  
+   
     </body> 
 </html>

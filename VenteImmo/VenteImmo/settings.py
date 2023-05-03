@@ -75,12 +75,18 @@ WSGI_APPLICATION = 'VenteImmo.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'mydatabase',
+        'HOST': 'localhost',
+        'PORT': 27017,
+        'AUTH_SOURCE': 'admin',
+        'USERNAME': 'myusername',
+        'PASSWORD': 'mypassword',
+        'ENFORCE_SCHEMA': False,
+    }   
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
