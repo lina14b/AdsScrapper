@@ -6,7 +6,7 @@ import pandas as pd
 b=BienImmobilier()
 list=b.readAll_TA_TV()
 df = pd.DataFrame(list)
-
+print("1")
 
 #######Find duplicates #######Delete dupilcates
 counts = df.groupby(["code"]).size().reset_index(name="count")

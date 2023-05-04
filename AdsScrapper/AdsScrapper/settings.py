@@ -19,6 +19,17 @@ NEWSPIDER_MODULE = "AdsScrapper.spiders"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_splash.SplashMiddleware': 725,
+}
+
+SPIDER_MIDDLEWARES = {
+    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
+}
+
+SPLASH_URL = 'http://localhost:8050/'
+
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 

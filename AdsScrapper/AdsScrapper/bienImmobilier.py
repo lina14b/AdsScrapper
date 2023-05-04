@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+from transformationText import TransformationTexte
 
 
 
@@ -36,6 +37,64 @@ class BienImmobilier:
         self.imagesurlslist = []
         self.anneeconstruction = None
         self.TotalDescp=None
+   
+    def extractRemax(self,row):
+        print("\nhere")
+        self.website = "remax.com.tn"
+
+        self.url = row['url']
+
+        row['Code']=row['Code'].replace(" ", "")
+        if row['Code']:
+         self.code=int(row['Code'], 10)
+        
+        self.description = row['description']
+        if row['price']:
+         number = int(re.sub(r"\D", "", row['price']))
+         self.price=number
+        
+
+        if row['surface']:
+          numeric_only = re.sub(r'[^\d]', '', row['surface']) 
+          self.surfaceTotale = numeric_only
+        if row['surface_constructible']:
+          numeric_only = re.sub(r'[^\d]', '', row['surface_constructible']) 
+          self.surface_habitable = numeric_only
+        if row['address']:
+         self.adresse =  row['address']
+         parts = [p.strip() for p in self.adresse.split('-')]
+         self.country = parts[-1]
+         self.state = parts[-2]
+         self.zone = None
+         self.ville = parts[-3]
+        if row['Etage']:
+         numeric_only = re.sub(r'[^\d]', '', row['Etage']) 
+         self.etage =  numeric_only
+        if row['Parking']:
+         numeric_only = re.sub(r'[^\d]', '', row['Parking']) 
+         self.place_voiture = numeric_only
+
+        self.characteristicslist = row['Equipement']
+        if row['chambres']:
+         numeric_only = re.sub(r'[^\d]', '', row['chambres']) 
+         self.nombre_de_chambre = numeric_only
+       
+        if row['pieces']:
+         numeric_only = re.sub(r'[^\d]', '', row['pieces']) 
+         self.nombre_de_piece = numeric_only
+
+        if row['Salles_de_bain']:
+         numeric_only = re.sub(r'[^\d]', '', row['Salles_de_bain']) 
+         self.nombre_de_salle_de_bain = numeric_only
+        elif row['Salles_deau']:
+         numeric_only = re.sub(r'[^\d]', '', row['Salles_deau']) 
+         self.nombre_de_salle_de_bain = numeric_only
+
+        self.datescraped = datetime.strptime(row['ScrapedDate'], '%d-%m-%Y %H:%M:%S') 
+        self.dateinstered = self.datescraped   
+        self.total_description()      
+        self.imagesurlslist = row['image_urls']      
+       
    
     def extractTunisieVente(self,row):
     #Url
@@ -452,9 +511,35 @@ class BienImmobilier:
       # # Access a database and a collection
       # db = client["AdsScrappers"]
       # collection = db["Ads"]
+      text=" "
+      newdescription=" "
+      t=TransformationTexte()
+      if self.description:
+          newdescription=newdescription+" "+str(self.description)
+          test=1
+      
+      if self.adresse:
+          newdescription=newdescription+" "+str(self.adresse)
+          test=1
+      
+      if self.nombre_de_chambre:
+          newdescription=newdescription+' s+ ' +str(self.nombre_de_chambre)
+          test=1
+      
+      if test==1:
+       text=t.TransormRawText(newdescription)
+      
+      if self.ville:
+        text=text+" "+ str(self.ville).lower()
+        test=1
+      if test==1:
+       self.TotalDescp=text
+
+
       property_dict = BI.__dict__
       filtered_dict = {k: v for k, v in property_dict.items() if v is not None}
       result = self.collection.insert_one(filtered_dict)
+      print("added")
       self.SaveDb_Historisation()
     
     def SaveDb_Historisation(self):
