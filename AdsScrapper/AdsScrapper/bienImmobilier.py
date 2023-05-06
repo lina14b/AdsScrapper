@@ -51,6 +51,8 @@ class BienImmobilier:
         self.description = row['description']
         if row['price']:
          number = int(re.sub(r"\D", "", row['price']))
+         if number<1000:
+          number=number*1000  
          self.price=number
         
 
@@ -877,4 +879,7 @@ class BienImmobilier:
 
         return ListAll 
     
+    def Numberofdocs(self):
+      num_documents = self.collection.count_documents({})
+      return num_documents
     

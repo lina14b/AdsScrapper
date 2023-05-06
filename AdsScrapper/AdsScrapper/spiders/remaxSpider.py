@@ -132,6 +132,7 @@ class RemaxspiderSpider(scrapy.Spider):
         description2 = response.css("#ListingFullLeft_ctl00_DescriptionDivShort.desc-short ::text").getall()
         description = "".join(description).replace('\n','').replace('\r','') 
         description2 = "".join(description2).replace('\n','').replace('\r','') 
+        full=""
         if description:
             full=description
         if description2:

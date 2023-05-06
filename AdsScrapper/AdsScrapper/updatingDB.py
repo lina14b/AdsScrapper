@@ -4,6 +4,9 @@ import pandas as pd
 
 #######Find All TA et TV
 b=BienImmobilier()
+
+print(b.Numberofdocs())
+print("******************")
 list=b.readAll_TA_TV()
 df = pd.DataFrame(list)
 print("1")
