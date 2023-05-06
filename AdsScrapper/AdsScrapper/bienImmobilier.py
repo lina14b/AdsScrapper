@@ -370,6 +370,49 @@ class BienImmobilier:
 
      self.total_description()
 
+
+    def extractTayara(self,row):
+        
+        self.website = "tayara.tn"
+        self.url = row['url']
+        self.description = row['description']
+        
+        if row['price']:
+         number = row['price']
+         if number<1000:
+          number=number*1000  
+         self.price=number
+        
+
+        if row['surface']:
+          numeric_only = re.sub(r'[^\d]', '', row['surface']) 
+          self.surfaceTotale = numeric_only
+
+        if row['adress']:
+         self.adresse =  row['adress']
+        
+        self.country = "Tunisie"
+       
+        if row['ville']:
+         self.ville = row['ville']
+        if row['state']:
+         self.state = row['state']
+
+        if row['Nb_chambre']:
+         numeric_only = re.sub(r'[^\d]', '', row['Nb_chambre']) 
+         self.nombre_de_chambre = numeric_only
+       
+        if row['Nb_SalleBain']:
+         numeric_only = re.sub(r'[^\d]', '', row['Nb_SalleBain']) 
+         self.nombre_de_salle_de_bain = numeric_only
+        
+        self.datescraped = datetime.strptime(row['ScrapedDate'], '%d-%m-%Y %H:%M:%S') 
+        if row['AddedDate']:
+         self.dateinstered =  row['AddedDate'] 
+
+        self.total_description()      
+        self.imagesurlslist = row['image_urls']  
+
     def print_maison(self):
         print("Website:", self.website)
         print("URL:", self.url)

@@ -15,9 +15,10 @@ import json
 import csv
 import os
 from bienImmobilier import BienImmobilier
+from pymongo import MongoClient
 
-class TayaraSpider(scrapy.Spider):
-    name = 'TayaraSpider'
+class TayaraFailsSpider(scrapy.Spider):
+    name = 'TayaraFailsSpider'
     allowed_domains = ['www.tayara.tn']
     start_urls = ['https://www.tayara.tn/ads/c/Immobilier/']
 #'https://www.tayara.tn/ads/c/Immobilier/k/vente/'
@@ -40,75 +41,55 @@ class TayaraSpider(scrapy.Spider):
         self.filename = 'links.csv'
         self.count=0
 
-        if not os.path.isfile(self.filename):
-            with open(self.filename, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['Link'])
     
     def parse(self, response):
-        self.driver.get(response.url)
-        articles=""
-        i=0
+        # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        # db = client["AdsScrappers"]
+        # collection = db["Ads"]
+        # result = collection.delete_many({"website": "tayara.tn"})
+        # print(result.deleted_count, "documents deleted")
+              
+        # Read links from CSV file into a list
+        links=[]
+        with open('links.csv', 'r') as f:
+            reader = csv.reader(f)
+            next(reader)
+            links = [row[0] for row in reader]
+        print("\n\n",len(links)) 
+        # Check each link and remove it from the list if the condition is true
         b=BienImmobilier()
-        while True:
-        
-       # while self.num<30:
-           #########################################
+        i=0
+        j=0
+        new_links = []
+        for link in links:
+            if b.ReadbyUrl(link):
+                i=i+1
+                print(i," exist")
+                pass
+            else:
+                j=j+1
+                new_links.append(link)
+                print(j," doesnt exist")
 
-            self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-            time.sleep(2) 
-            response = scrapy.http.HtmlResponse(
-                url=self.driver.current_url,
-                body=self.driver.page_source,
-                encoding='utf-8'
-            )
-           #########################################
-            hrefs = response.css('a::attr(href)').getall()
-            
-            
-            articlesAll = response.css('article')
-            
-            time.sleep(1)
-            articles=articlesAll[self.num+1:]
-            # for article in articles:
-            #    link = article.css('a::attr(href)').get()
-            #    print(i," - ","https://www.tayara.tn"+link)
-            #    i+=1
-            #    self.num+=1
-            
-            for article in articles:
-               
-               self.num+=1
-               link = article.css('a::attr(href)').get()
-               path="https://www.tayara.tn"+link
-               if b.ReadbyUrl(path):
+        #updated links back to CSV file
+        with open('links.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['links'])
+        b=BienImmobilier()
+        for link in new_links:       
+         if b.ReadbyUrl(link):
                 self.count+=1
                 continue
-               
-               else:              
-                yield scrapy.Request(path, callback=self.parse_details, meta={'url':path})             
-                time.sleep(2)
-               
-                print(self.parsed)
+         else:              
+                yield scrapy.Request(link, callback=self.parse_details, meta={'url':link})             
+                time.sleep(1)              
                 if not self.parsed:
-                 with open(self.filename, mode='a', newline='') as file:
-                    
+                  with open(self.filename, mode='a', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow([path])
+                    writer.writerow([link])
 
                 self.parsed=False
-                if self.count>=15:
-                  raise scrapy.exceptions.CloseSpider("no more links to scrap")
-            
-            
-            if not articles:
-                break
-            
-            
-            last_href = hrefs[-1]
-            self.driver.execute_script(f"window.location.hash='{last_href}'")
-            print("out",self.num)
-            time.sleep(2)
+                
             
 
 
@@ -116,11 +97,9 @@ class TayaraSpider(scrapy.Spider):
      print("\n\n\n_________________start___________________________")
      self.parsed=True
      url=response.meta['url']
-     
+     time.sleep(1)
      title = response.xpath('//title/text()').get()
      
-    #  price =response.css('span.mr-1::text').get()
-     time.sleep(1)
      span=response.css('div.flex.items-center.space-x-1.mb-1 span::text').getall()
      state,date=span[0].split(",")
      adress=""
@@ -143,25 +122,6 @@ class TayaraSpider(scrapy.Spider):
      nombre_de_salle_de_bain = next((param['value'] for param in data['props']['pageProps']['adDetails']['adParams'] if param['label'] == 'Salles de bains'), None)
      transaction= next((param['value'] for param in data['props']['pageProps']['adDetails']['adParams'] if param['label'] == 'Type de transaction'), None)
    
-
-    #  print("****************************************")
-    #  print("1",url) #
-    #  print(" 2",title)#
-    #  print(" 3",price)#
-    #  print(" 4",span)
-    #  print(" 5",state,"-",date,"-",adress)#
-    # #  print(" 6",get_date_from_time_ago(date))
-    #  print(" 7",published_on)#
-    #  print(" 8",description)#
-    #  print(" 9",date)#
-    #  print(" 10",location['delegation'])
-    #  print(" 11",location['governorate'])
-    #  print(" 12",f"Location: {location}")#
-    #  print(" 13",f"Superficie: {superficie}")#
-    #  print(" 14",f"Nombre de chambres: {nombre_de_chambres}")
-    #  print(" 15",f"Nombre de salle de bain: {nombre_de_salle_de_bain}")
-    #  print(" 16",transaction)
-    #  print(" 17",images)
      
      now = datetime.now()
      ScrapedDate = now.strftime("%d-%m-%Y %H:%M:%S")       
@@ -170,14 +130,11 @@ class TayaraSpider(scrapy.Spider):
             "ville":location['delegation'] ,'state': location['governorate'],'surface': superficie,'price': price,
              "Nb_chambre":nombre_de_chambres,"Nb_SalleBain":nombre_de_salle_de_bain,
             'image_urls': images,'AddedDate':date,'ScrapedDate':ScrapedDate}
-     test=False
+     
      if not transaction:
         transaction="**"
-        if not superficie:
-           test=True
-
         
-     if "Ven" in transaction or test:
+     if "Ven" in transaction or not superficie:
         print("added")
         b=BienImmobilier()
         b.extractTayara(row)
@@ -186,8 +143,7 @@ class TayaraSpider(scrapy.Spider):
         b.SaveDb(b)
      print("\n\n\n__________________END__________________________")
 
-
-
     def closed(self, reason):
         self.driver.quit()
     
+ 
