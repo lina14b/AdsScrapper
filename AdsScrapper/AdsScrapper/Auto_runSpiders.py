@@ -14,6 +14,7 @@ tps=subprocess.Popen(['scrapy', 'crawl', 'TPSSpider'])
 tp=subprocess.Popen(['scrapy', 'crawl', 'tunisiapromoSpider'])
 tA=subprocess.Popen(['scrapy', 'crawl', 'TunisieAnnonceSpider'])
 rmX=subprocess.Popen(['scrapy', 'crawl', 'remaxSpider'])
+Tayara=subprocess.Popen(['scrapy', 'crawl', 'TayaraSpider'])
 # Wait for all spiders to finish
 bnb.wait()
 tps.wait()
@@ -29,6 +30,9 @@ final=b.Numberofdocs()
 print(final)
 print(final-init)
 
+Tayara.wait()
+TayaraFails=subprocess.Popen(['scrapy', 'crawl', 'TayaraFailsSpider'])
+TayaraFails.wait()
 
 # Run last.py
 file_path=os.getcwd()
@@ -37,7 +41,7 @@ print(file_path)
 update=subprocess.Popen(['python',file_path+'\\AdsScrapper\\updatingDB.py'])
 update.wait()
 final=b.Numberofdocs()
-print(final)
-print(final-init)
+print("iems in db",final)
+print("inserted",final-init)
 print("\n \n end.. close the tab")
 

@@ -79,10 +79,11 @@ class TayaraFailsSpider(scrapy.Spider):
         for link in new_links:       
          if b.ReadbyUrl(link):
                 self.count+=1
+                print(" exist")
                 continue
          else:              
                 yield scrapy.Request(link, callback=self.parse_details, meta={'url':link})             
-                time.sleep(1)              
+                time.sleep(3)              
                 if not self.parsed:
                   with open(self.filename, mode='a', newline='') as file:
                     writer = csv.writer(file)
@@ -97,7 +98,7 @@ class TayaraFailsSpider(scrapy.Spider):
      print("\n\n\n_________________start___________________________")
      self.parsed=True
      url=response.meta['url']
-     time.sleep(1)
+    #  time.sleep(1)
      title = response.xpath('//title/text()').get()
      
      span=response.css('div.flex.items-center.space-x-1.mb-1 span::text').getall()
@@ -109,7 +110,7 @@ class TayaraFailsSpider(scrapy.Spider):
      data = json.loads(response.xpath('//script[@id="__NEXT_DATA__"]/text()').extract_first())
      ad_data = data['props']['pageProps']['adDetails']
      title = ad_data['title']
-     time.sleep(1)
+    #  time.sleep(1)
      description = ad_data['description']
      phone = ad_data['phone']
      price = ad_data['price']

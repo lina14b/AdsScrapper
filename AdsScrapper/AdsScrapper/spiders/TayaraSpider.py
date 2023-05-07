@@ -24,7 +24,7 @@ class TayaraSpider(scrapy.Spider):
 #https://www.tayara.tn/ads/c/Immobilier/'
     custom_settings = {
         
-        'DOWNLOAD_DELAY': 4, # 10 seconds delay
+        'DOWNLOAD_DELAY': 1, # 10 seconds delay
         'RETRY_TIMES': 3,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 408]
 
@@ -68,7 +68,7 @@ class TayaraSpider(scrapy.Spider):
             
             articlesAll = response.css('article')
             
-            time.sleep(1)
+            # time.sleep(1)
             articles=articlesAll[self.num+1:]
             # for article in articles:
             #    link = article.css('a::attr(href)').get()
@@ -87,7 +87,7 @@ class TayaraSpider(scrapy.Spider):
                
                else:              
                 yield scrapy.Request(path, callback=self.parse_details, meta={'url':path})             
-                time.sleep(2)
+                time.sleep(1)
                
                 print(self.parsed)
                 if not self.parsed:
@@ -97,7 +97,7 @@ class TayaraSpider(scrapy.Spider):
                     writer.writerow([path])
 
                 self.parsed=False
-                if self.count>=15:
+                if self.count>=25:
                   raise scrapy.exceptions.CloseSpider("no more links to scrap")
             
             
@@ -120,7 +120,7 @@ class TayaraSpider(scrapy.Spider):
      title = response.xpath('//title/text()').get()
      
     #  price =response.css('span.mr-1::text').get()
-     time.sleep(1)
+    #  time.sleep(1)
      span=response.css('div.flex.items-center.space-x-1.mb-1 span::text').getall()
      state,date=span[0].split(",")
      adress=""
