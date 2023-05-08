@@ -37,6 +37,7 @@ class BienImmobilier:
         self.imagesurlslist = []
         self.anneeconstruction = None
         self.TotalDescp=None
+        self.tokens=[]
    
     def extractRemax(self,row):
         print("\nhere")

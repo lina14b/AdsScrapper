@@ -221,9 +221,17 @@ class FacebookSpider(scrapy.Spider):
         matches = re.findall(pattern, code)
         description=" "
         if len(matches)>0:
-            text = re.sub(r'[\ud800-\udbff][\udc00-\udfff]', '<?>', code)
-            description = text.encode('latin1').decode('iso-8859-1')
-            description= description.encode('utf-8').decode('unicode_escape')
+            # text = re.sub(r'[\ud800-\udbff][\udc00-\udfff]', '<?>', code)
+            # description = text.encode('latin1').decode('iso-8859-1')
+            # description= description.encode('utf-8').decode('unicode_escape')
+            try:
+                text = re.sub(r'[\ud800-\udbff][\udc00-\udfff]', '<?>', code)
+                text = text.encode("utf-8", "ignore").decode("utf-8")
+                text = text.encode("utf-8")
+                text = text.decode("utf-8", "surrogatepass")
+                description=text
+            except Exception as e:
+             print("An error occurred:", e)
         else:
             text = re.sub(r'\\ud[8-9a-f][0-9a-f]{2}|\\ud[a-f][0-9a-f]{3}', '', code)
             description = text.encode('utf-8').decode('unicode_escape')
