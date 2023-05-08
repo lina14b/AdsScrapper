@@ -17,6 +17,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from bienImmobilier import BienImmobilier
 
 
+
 class RemaxspiderSpider(scrapy.Spider):
     name = "remaxSpider"
     allowed_domains = ["remax.com.tn"]
@@ -49,11 +50,13 @@ class RemaxspiderSpider(scrapy.Spider):
         print(links)
         print(response.urljoin(links[0]))
         b=BienImmobilier()
+        i=0
         for link in links:
+         i+=1
          if not b.ReadbyUrl(response.urljoin(link)):
           yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
          else: 
-             print("already saved")
+             print(i," already saved")
     
     def parse_details(self, response):
         
@@ -79,7 +82,8 @@ class RemaxspiderSpider(scrapy.Spider):
 
         price_div = response.css('div.key-price-div')
         if(price_div):
-         price = price_div.css('a[itemprop="price"]::text').get().strip()
+         if price_div.css('a[itemprop="price"]::text').get():
+           price = price_div.css('a[itemprop="price"]::text').get().strip()
         address = response.css('div.key-address::text').get().strip()
         # print(price)
         # print(address)

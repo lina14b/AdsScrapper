@@ -413,6 +413,44 @@ class BienImmobilier:
         self.total_description()      
         self.imagesurlslist = row['image_urls']  
 
+    
+    def extractFB(self,row):
+        
+        self.website = "facebook.com"
+        self.url = row['url']
+        self.description = row['description']
+        
+        if row['price']:
+         price=row['price'].replace(".00","")
+         price=price.replace(" ","")
+         numeric_only = re.sub(r'[^\d]', '', price) 
+         number = int(price)
+         if number<1000:
+          number=number*1000  
+         self.price=number
+        
+
+        if row['address']:
+         self.adresse =  row['address']
+        
+        self.country = "Tunisie"
+       
+        if row['location']:
+         location=row['location']
+         for item in location:
+          if "Délégation" in item:
+           self.ville = item.replace(" Délégation ","")
+          elif "Gouvernorat" in item:
+           self.state = item.replace(" Gouvernorat ","")
+
+        
+        
+        self.datescraped = datetime.strptime(row['ScrapedDate'], '%d-%m-%Y %H:%M:%S') 
+        self.dateinstered =  self.datescraped 
+
+        self.total_description()      
+        self.imagesurlslist = row['image_urls']  
+
     def print_maison(self):
         print("Website:", self.website)
         print("URL:", self.url)

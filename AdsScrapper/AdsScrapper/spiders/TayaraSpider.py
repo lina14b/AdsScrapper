@@ -85,7 +85,8 @@ class TayaraSpider(scrapy.Spider):
                 self.count+=1
                 continue
                
-               else:              
+               else:
+                print("count",self.count)              
                 yield scrapy.Request(path, callback=self.parse_details, meta={'url':path})             
                 time.sleep(1)
                
@@ -97,7 +98,7 @@ class TayaraSpider(scrapy.Spider):
                     writer.writerow([path])
 
                 self.parsed=False
-                if self.count>=25:
+                if self.count>=30:
                   raise scrapy.exceptions.CloseSpider("no more links to scrap")
             
             

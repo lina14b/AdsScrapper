@@ -98,7 +98,7 @@ class TayaraFailsSpider(scrapy.Spider):
      print("\n\n\n_________________start___________________________")
      self.parsed=True
      url=response.meta['url']
-    #  time.sleep(1)
+     time.sleep(3)
      title = response.xpath('//title/text()').get()
      
      span=response.css('div.flex.items-center.space-x-1.mb-1 span::text').getall()

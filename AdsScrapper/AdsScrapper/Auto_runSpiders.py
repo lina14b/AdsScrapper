@@ -15,12 +15,14 @@ tp=subprocess.Popen(['scrapy', 'crawl', 'tunisiapromoSpider'])
 tA=subprocess.Popen(['scrapy', 'crawl', 'TunisieAnnonceSpider'])
 rmX=subprocess.Popen(['scrapy', 'crawl', 'remaxSpider'])
 Tayara=subprocess.Popen(['scrapy', 'crawl', 'TayaraSpider'])
+fb=subprocess.Popen(['scrapy', 'crawl', 'FacebookSpider'])
 # Wait for all spiders to finish
 bnb.wait()
 tps.wait()
 tp.wait()
 tA.wait()
 rmX.wait()
+fb.wait()
 
 # Run spider 4
 TV=subprocess.Popen(['scrapy', 'crawl', 'TunisieVenteSpider'])
