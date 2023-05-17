@@ -353,7 +353,7 @@ class BienImmobilier:
    
      self.adresse =  None
      self.country = None
-     self.state = row['localisation']
+     self.state = None
      self.zone = row['localisation']
      self.ville = None
 

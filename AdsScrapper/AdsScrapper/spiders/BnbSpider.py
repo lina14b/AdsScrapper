@@ -8,7 +8,7 @@ module_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(module_dir)
 from bienImmobilier import BienImmobilier
 import csv
-
+import time
 
 class BnbspiderSpider(scrapy.Spider):
     name = "BnbSpider"
@@ -43,7 +43,9 @@ class BnbspiderSpider(scrapy.Spider):
 
     def parse(self, response):       
         links = response.css('a.property-row-picture-target::attr(href)').extract()
-
+        print(links)
+        print("___________________________")
+        time.sleep(10)
         ########################
         Url_List=[]
         count=0
@@ -70,8 +72,8 @@ class BnbspiderSpider(scrapy.Spider):
         for link in Url_List:
            yield scrapy.Request(url=response.urljoin(link), callback=self.parse_details, meta={'url': response.urljoin(link)})
         
-        if len(Url_List)==0 or count>=9:
-           raise scrapy.exceptions.CloseSpider("no more links to scrap")
+        if count>=9:
+           raise scrapy.exceptions.CloseSpider("no more links to scrap "+str(count))
         #############################
 
         next_page = response.xpath('//a[contains(@class, "next")]/@href').get()        
