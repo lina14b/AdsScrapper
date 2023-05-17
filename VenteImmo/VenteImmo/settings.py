@@ -77,14 +77,8 @@ WSGI_APPLICATION = 'VenteImmo.wsgi.application'
 DATABASES = {
 
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'mydatabase',
-        'HOST': 'localhost',
-        'PORT': 27017,
-        'AUTH_SOURCE': 'admin',
-        'USERNAME': 'myusername',
-        'PASSWORD': 'mypassword',
-        'ENFORCE_SCHEMA': False,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }   
 }
 
