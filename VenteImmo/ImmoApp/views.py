@@ -57,17 +57,17 @@ def populate_data():
 
 
 def index(request):
-    if not my_data:
-        print("populate data")
-        populate_data()
-    page_number = request.GET.get('page', 1)
-    page_number = int(page_number)
-    cached_data = cache.get(f'my_data_{page_number}')
-    data=[]
-    if cached_data is not None:
-        # Use the cached data
-        data = cached_data
-    else:
+        if not my_data:
+            print("populate data")
+            populate_data()
+        page_number = request.GET.get('page', 1)
+        page_number = int(page_number)
+        # cached_data = cache.get(f'my_data_{page_number}')
+        data=[]
+    # if cached_data is not None:
+    #     # Use the cached data
+    #     data = cached_data
+    # else:
         MONGO_URI = 'mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/?retryWrites=true&w=majority'
         client = MongoClient(MONGO_URI)
         db = client['AdsScrappers']
@@ -85,9 +85,11 @@ def index(request):
             data = paginator.page(paginator.num_pages)
 
         # Cache the data
-        cache.set(f'my_data_{page_number}', data,timeout=3600)
+        # cache.set(f'my_data_{page_number}', data,timeout=3600)
        
-    return render(request, 'Home.html', {'data': data, 'page': page_number,'state':ville})
+    
+        return render(request, 'Home.html', {'data': data, 'page': page_number,'state':ville})
+
 def sort(request):
     global my_data
     print(len(my_data))
