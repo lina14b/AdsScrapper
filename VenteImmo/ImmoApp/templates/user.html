@@ -17,11 +17,14 @@
     <div class="container-fluid">
       {% if request.user.is_authenticated %}
       <p class="text-success"> You are Logged In </p>
-      <p class="text-success">Username : {{ request.user.username }}</p>
+      <p class="text h4">Username : {{ request.user.username }}</p>
+      <p class="text ">First Name : {{ request.user.first_name }}</p>
+      <p class="text ">Last Name : {{ request.user.last_name }}</p>
       <a href={% url 'logout_user' %} type="button" class="btn btn-success">Log Out</a>
       {% else %}
           <p class="text-danger">User is not logged in </p>
           <a href={% url 'register' %} type="button" class="btn btn-success">Register</a>
+          <a href={% url 'login_user' %} type="button" class="btn btn-success">Log In</a>
       {% endif %}
     </div>
     
