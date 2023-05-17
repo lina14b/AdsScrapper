@@ -610,12 +610,14 @@ class BienImmobilier:
           newdescription=newdescription+' s+ ' +str(self.nombre_de_chambre)
           test=1
       
-      if test==1:
-       text=t.TransormRawText(newdescription)
-      
       if self.ville:
         text=text+" "+ str(self.ville).lower()
         test=1
+
+      if test==1:
+       text=t.transform(newdescription)
+      
+     
       if test==1:
        self.TotalDescp=text
 
@@ -777,8 +779,10 @@ class BienImmobilier:
              BI.nombre_de_salle_de_bain = result['nombre_de_salle_de_bain']
             if 'datescraped'in result:
              BI.datescraped = result['datescraped']
+            #  BI.datescraped =datetime.strptime(BI.datescraped , '%Y-%m-%d %H:%M:%S')
             if 'dateinstered'in result:
              BI.dateinstered = result['dateinstered']
+            #  BI.dateinstered =datetime.strptime(BI.dateinstered , '%Y-%m-%d %H:%M:%S')
             if 'datemodified'in result:
              BI.datemodified = result['datemodified']
             if 'imagesurlslist'in result:

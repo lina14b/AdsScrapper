@@ -31,51 +31,95 @@
         </div>
       </nav>
       
-  <div class="col-12">
-    <label class="visually-hidden" for="inlineFormSelectPref">Trier par</label>
-    <select class="form-select" id="inlineFormSelectPref">
-      <option selected>Choisir...</option>
-      <option value="1">Trier par prix</option>
-      <option value="2">Trier par date</option>
-      
-    </select>
+     
+  
+    
   </div>
       <form>
         <label for="search">Rechercher :</label>
         <input type="text" id="search" name="search">
         <input type="submit" value="Rechercher">
       </form>
-      <p>
-        
-        
-            <td></td>
-            <!-- Add more table cells for each field in your data -->
-        </tr>
-    
-      </p>
+      <br><br>
+      <form method="GET" action="{% url 'sort' %}">
+      
+        <span class="price">Prix</span>
+        <div class="button-container">
+          <button class="up-arrow" type="submit" name="up-arrow">↑</button>
+          <button class="down-arrow" type="submit" name="down-arrow">↓</button>
+        </div>
+        <span class="price">Date</span>
+        <div class="button-container">
+          <button class="up-arrow" type="submit" name="old">↑</button>
+          <button class="down-arrow" type="submit" name="new">↓</button>
+        </div>
+    </form>
+    <br><br><br>
+    <form method="POST" action="{% url 'filter' %}">
+      {% csrf_token %} 
+      <label for="min_price">Price:</label>
+      <input type="number" name="min_price" id="min_price" placeholder="Min"><span> &nbsp; &nbsp; </span>
+      <input type="number" name="max_price" id="max_price" placeholder="Max"><span> &nbsp; &nbsp; </span>
+      <select name="state">
+        <option disabled selected value> -- select an option -- </option>
+
+        {% for item in state %}
+          <option value="{{item}}">{{item}}</option>
+        {% endfor %}
+      </select>
+    <button class="down-arrow" type="submit" name="new">Find</button>
+   </form>
+   <br><br>
       <div id="bot" class="container-lg" style="margin-top:20px ;"class="row">
         <div class="card-deck">
+          {% autoescape on %}
           {% for item in data %}
           <div id="im0" class="col-4">
-            {% if item.imagesurlslist %}
-            <img src="http://{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
-            {% else %}
-            <img src="https://atlas-content-cdn.pixelsquid.com/stock-images/simple-house-NxE5a78-600.jpg" class="card-img-top" style="height:195px;width: 350px;" alt="">
-            {% endif %}
-            <div class="card-body">
-               <h5>{{ item.ville|safe}} | {{ item.price|safe}} TND</h5>
-              <p class="card-text"> {{ item.description|slice:":50" }}...
-                </p>
-                <a href="{{ item.url|safe }}" class="Carte">site original</a>
-
-            </div>
-            
+              {% if item.imagesurlslist %}
+              {% if item.website == "facebook.com"%}
+              <img src="{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
+              {% elif item.website == "remax.com.tn" or item.website == "tayara.tn" or item.website == "bnb.tn"%}
+              <img src="{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
+              
+              {% else %}
+              <img src="http://{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
+              {% endif %}
+              {% else %}
+              <img src="https://atlas-content-cdn.pixelsquid.com/stock-images/simple-house-NxE5a78-600.jpg" class="card-img-top" style="height:195px;width: 350px;" alt="">
+              {% endif %}
+              <div class="card-body">
+                  <h5>{{ item.website|safe }}{{ item.ville|safe }} | {{ item.price|safe }} TND</h5>
+                  <p class="card-text">{{ item.description|slice:":50"|safe |escapejs }}...</p>
+                  <a href="{{ item.url|safe }}" class="Carte">site original</a>
+              </div>
           </div>
           {% endfor %}
+          {% endautoescape %}
+      </div>
+      
+      {% if data.has_other_pages %}
+      <div class="pagination">
+          {% if data.has_previous %}
+          <a href="?page={{ data.previous_page_number }}"> previous </a>
+          {% endif %}
+      
+          <span>    </span>
+      
+          {% if data.has_next %}
+          <a href="?page={{ data.next_page_number }}">    ---- next </a>
+          {% endif %}
+      </div>
+      {% endif %}
+      
+      
 
 
-            
-        </div>
+
+
+
+
+
+
         
         
        
