@@ -33,9 +33,9 @@ print(final-init)
 Tayara.wait()
 TayaraFails=subprocess.Popen(['scrapy', 'crawl', 'TayaraFailsSpider'])
 TayaraFails.wait()
-# fb=subprocess.Popen(['scrapy', 'crawl', 'FacebookSpider'])
+fb=subprocess.Popen(['scrapy', 'crawl', 'FacebookSpider'])
 
-# fb.wait()
+fb.wait()
 
 # Run last.py
 file_path=os.getcwd()

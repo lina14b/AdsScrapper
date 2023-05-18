@@ -89,7 +89,7 @@
               {% endif %}
               <div class="card-body">
                   <h5>{{ item.website|safe }}{{ item.ville|safe }} | {{ item.price|safe }} TND</h5>
-                  <p class="card-text">{{ item.description|slice:":50"|safe |escapejs }}...</p>
+                  <p class="card-text">{{ item.description|slice:":50"|safe}}...</p>
                   <a href="{{ item.url|safe }}" class="Carte">site original</a>
               </div>
           </div>

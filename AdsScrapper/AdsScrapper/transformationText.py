@@ -51,6 +51,8 @@ class TransformationTexte (BaseEstimator, TransformerMixin):
          return vectors
       
     def transform(self, X, y=None):
+        text=re.sub(r'\\u[a-fA-F0-9]{4}', '', X)
+        X = text.replace(r"\n", "")
         language=detect(X)
         print(language)
         if language=="fr":

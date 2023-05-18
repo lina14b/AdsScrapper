@@ -107,17 +107,5 @@ class BnbspiderSpider(scrapy.Spider):
        b.noneCheck()
        b.print_maison()
        b.SaveDb(b)
-    #    # define file path
-    #    file_path = "C:/Users/Lina/Desktop/Bnb.csv"
-    #     # check if file exists, create it if it doesn't
-    #    if not os.path.exists(file_path):
-    #         df.to_csv(file_path, index=False)
-    #    else:
-    #         # read existing file into DataFrame
-    #         existing_df = pd.read_csv(file_path)
-            
-    #         # append new DataFrame to existing file
-    #         new_df = existing_df.append(df, ignore_index=True)
-    #         new_df.to_csv(file_path, index=False)
        
 

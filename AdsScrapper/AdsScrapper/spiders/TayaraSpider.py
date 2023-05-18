@@ -123,10 +123,12 @@ class TayaraSpider(scrapy.Spider):
     #  price =response.css('span.mr-1::text').get()
     #  time.sleep(1)
      span=response.css('div.flex.items-center.space-x-1.mb-1 span::text').getall()
-     state,date=span[0].split(",")
+     print(span)
+     print(len(span))
+     state,date=span[1].split(",")
      adress=""
      if len(span)>2:
-         if "annonce(s)" in span[1]:
+         if "annonce(s)" in span[0]:
           adress=span[1]
      data = json.loads(response.xpath('//script[@id="__NEXT_DATA__"]/text()').extract_first())
      ad_data = data['props']['pageProps']['adDetails']
@@ -150,7 +152,7 @@ class TayaraSpider(scrapy.Spider):
     #  print(" 2",title)#
     #  print(" 3",price)#
     #  print(" 4",span)
-    #  print(" 5",state,"-",date,"-",adress)#
+     print(" 5",state,"-",date,"-",adress)#
     # #  print(" 6",get_date_from_time_ago(date))
     #  print(" 7",published_on)#
     #  print(" 8",description)#

@@ -3,8 +3,9 @@ from datetime import datetime
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from transformationText import TransformationTexte
-
-
+from geopy.geocoders import GeoNames
+from geopy.exc import GeocoderUnavailable
+import time
 
 
 class BienImmobilier:
@@ -49,7 +50,11 @@ class BienImmobilier:
         if row['Code']:
          self.code=int(row['Code'], 10)
         
-        self.description = row['description']
+        if row['description']:
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text
+
         if row['price']:
          number = int(re.sub(r"\D", "", row['price']))
          if number<1000:
@@ -94,7 +99,8 @@ class BienImmobilier:
          self.nombre_de_salle_de_bain = numeric_only
 
         self.datescraped = datetime.strptime(row['ScrapedDate'], '%d-%m-%Y %H:%M:%S') 
-        self.dateinstered = self.datescraped   
+        self.dateinstered = self.datescraped
+        self.verifyLocation()   
         self.total_description()      
         self.imagesurlslist = row['image_urls']      
        
@@ -110,14 +116,18 @@ class BienImmobilier:
       self.code=int(row['Code'], 10)
     #Desc
      if row['description'] and not row['description'].isspace():
-      self.description=row['description']   
+       
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text
     ##price
      if  row['price']:
       numeric_only = re.sub(r'[^\d]', '', row['price'])
-      numeric_only=int(numeric_only, 10)
-      if numeric_only<1000:
-       numeric_only=numeric_only*1000  
-      self.price = numeric_only
+      if len(numeric_only)>0:
+       numeric_only=int(numeric_only, 10)
+       if numeric_only<1000:
+        numeric_only=numeric_only*1000  
+       self.price = numeric_only
      
     #surface
      if row['surface']:
@@ -128,6 +138,8 @@ class BienImmobilier:
      location=row['localisation']
      self.country = 'Tunisie'
      self.state = None
+     if not self.state:
+       self.state = self.get_state(location[2],"Tunisia")
      self.zone = location[2]
      self.ville = location[4]
      self.etage = None
@@ -153,6 +165,7 @@ class BienImmobilier:
       self.datemodified = datetime.strptime(row['date_Modification'], '%d/%m/%Y') 
 
      self.imagesurlslist = row['image_urls']
+     self.verifyLocation()
      self.total_description()
      
     def extractTunisiePromo(self,row):
@@ -165,15 +178,21 @@ class BienImmobilier:
 
      self.code=int(num, 10)
      row['description']=row['description'].replace("<p>", "")
-     row['description']=row['description'].replace("</p>", "")  
-     self.description=row['description']  
+     row['description']=row['description'].replace("</p>", "")
+     
+     if row['description']:
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text  
+     
      
      ##price
      numeric_only = re.sub(r'[^\d]', '', row['price'])
-     numeric_only=int(numeric_only, 10)
-     if numeric_only<1000:
-       numeric_only=numeric_only*1000   
-     self.price = numeric_only
+     if len(numeric_only)>0:
+      numeric_only=int(numeric_only, 10)
+      if numeric_only<1000:
+        numeric_only=numeric_only*1000   
+      self.price = numeric_only
     
      #surface
      if row['surface_totale']:
@@ -188,6 +207,8 @@ class BienImmobilier:
      self.adresse =  row['address']
      self.country = 'Tunisie'
      self.state = row['state']
+     if not row['state']:
+       self.state=self.get_state(row['ville'],"Tunisia")
      self.zone = None
      self.ville = row['ville']
      if row['num_etages']:
@@ -231,23 +252,31 @@ class BienImmobilier:
 
      numeric_only = re.sub(r'[^\d]', '', row['annee_construction'])
      self.anneeconstruction=numeric_only
-
+     self.verifyLocation()
      self.total_description()
     
     def extractTPS(self,row):
      self.website="tps-immobiliere.com"
      self.url=row['url']
-
-     self.code=int(row['Code'], 10)
-
-     self.description=row['description']  
+     if row['Code']:
+      self.code=int(row['Code'], 10)
+     
+     if row['description']:
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text
      
      ##price
-     numeric_only = re.sub(r'[^\d]', '', row['price'])
-     numeric_only=int(numeric_only, 10)
-     if numeric_only<1000:
-       numeric_only=numeric_only*1000   
-     self.price = numeric_only
+     print("######\n")
+     if row['price']:
+      numeric_only = re.sub(r'[^\d]', '', row['price'])
+      
+      # print(len(row['price']),row['price'],len(numeric_only))
+      if len(numeric_only)>0:
+       numeric_only=int(numeric_only, 10)
+       if numeric_only<1000:
+        numeric_only=numeric_only*1000   
+       self.price = numeric_only
      
      #surface
      if row['surface_totale']:
@@ -261,7 +290,7 @@ class BienImmobilier:
      self.country = None
      self.state = None
      self.zone = row['localisation']
-     self.ville = None
+     self.ville = self.zone
 
      self.etage = None
      self.place_voiture = None
@@ -282,23 +311,29 @@ class BienImmobilier:
      self.datemodified = self.datescraped  
 
      self.imagesurlslist = row['image_urls']
-
+     self.verifyLocation()
      self.total_description()
    
     def extractTA(self,row):
      self.website="tunisie-annonce.com"
      self.url=row['url']
      self.code=int(row['Code'], 10)
-     self.description=row['description']   
+     if row['description']:
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text  
      ##price
+     
      numeric_only = re.sub(r'[^\d]', '', row['price'])
-     numeric_only=int(numeric_only, 10)
-     if numeric_only<1000:
-       numeric_only=numeric_only*1000   
-     self.price = numeric_only
+     if len(numeric_only)>0:
+      numeric_only=int(numeric_only, 10)
+      if numeric_only<1000:
+        numeric_only=numeric_only*1000   
+      self.price = numeric_only
      #surface
-     numeric_only = re.sub(r'[^\d]', '', row['surface']) 
-     self.surfaceTotale = numeric_only
+     if row['surface']:
+      numeric_only = re.sub(r'[^\d]', '', row['surface']) 
+      self.surfaceTotale = numeric_only
      self.surface_habitable = None
      self.adresse =  row['adresse']
      self.country = 'Tunisie'
@@ -325,6 +360,7 @@ class BienImmobilier:
      self.datemodified = datetime.strptime(row['date_Modification'], '%d/%m/%Y') 
 
      self.imagesurlslist = row['image_urls']
+     self.verifyLocation()
      self.total_description()
     
     def extractBnb(self,row):
@@ -332,8 +368,11 @@ class BienImmobilier:
      self.url=row['url']
 
      self.code=int(row['Code'], 10)
-
-     self.description=row['description']  
+     if row['description']:
+      text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+      decoded_text = text.replace(r"\n", "") 
+      self.description=decoded_text
+      
      
      ##price
      row['price']=row['price'].replace(",", "")
@@ -355,7 +394,7 @@ class BienImmobilier:
      self.country = None
      self.state = None
      self.zone = row['localisation']
-     self.ville = None
+     self.ville = row['localisation']
 
 
      self.nombre_de_chambre = row['Nb_chambre']
@@ -368,6 +407,7 @@ class BienImmobilier:
      self.datemodified = self.datescraped  
 
      self.imagesurlslist = row['image_urls']
+     self.verifyLocation()
 
      self.total_description()
 
@@ -376,7 +416,10 @@ class BienImmobilier:
         
         self.website = "tayara.tn"
         self.url = row['url']
-        self.description = row['description']
+        if row['description']:
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text
         
         if row['price']:
          number = row['price']
@@ -410,7 +453,7 @@ class BienImmobilier:
         self.datescraped = datetime.strptime(row['ScrapedDate'], '%d-%m-%Y %H:%M:%S') 
         if row['AddedDate']:
          self.dateinstered =  row['AddedDate'] 
-
+        self.verifyLocation() 
         self.total_description()      
         self.imagesurlslist = row['image_urls']  
 
@@ -419,7 +462,11 @@ class BienImmobilier:
         
         self.website = "facebook.com"
         self.url = row['url']
-        self.description = row['description']
+        if row['description']:
+          text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
+          decoded_text = text.replace(r"\n", "") 
+          self.description=decoded_text
+      
         
         if row['price']:
          price=row['price'].replace(".00","")
@@ -448,10 +495,116 @@ class BienImmobilier:
         
         self.datescraped = datetime.strptime(row['ScrapedDate'], '%d-%m-%Y %H:%M:%S') 
         self.dateinstered =  self.datescraped 
-
+        self.verifyLocation()
         self.total_description()      
         self.imagesurlslist = row['image_urls']  
 
+    
+    def get_state(self,city, country):
+     time.sleep(4)
+     try:
+        geolocator = GeoNames(username="linab14")
+        location = geolocator.geocode(f"{city}, {country}", exactly_one=True)
+        if location is not None:
+            state = location.raw.get('adminName1')
+            state = state.replace(" Governorate", "")
+            state = state.replace("Governorate", "")
+            return state
+     except GeocoderUnavailable as e:
+         print("GeocoderUnavailable error:", e)
+ 
+     return None
+    
+    def verifyLocation(self):
+     getstate=0 
+     states_of_tunisia = ['Ariana','Beja','Ben Arous','Bizerte','Gabes','Gafsa','Jendouba','Kairouan','Kasserine','Kebili','Kef', 'Mahdia','Manouba','Medenine','Monastir','Nabeul','Sfax','Sidi Bouzid','Siliana','Sousse','Tataouine','Tozeur','Tunis','Zaghouan']
+     states_mapping = {'':'Ariana','Béja':'Beja','Ben arous':'Ben Arous','Bin ‘Arūs':'Ben Arous','Banzart':'Bizerte','Gabès':'Gabes','Qābis':'Gabes','.':'Gafsa','Jundūbah':'Jendouba','.':'Kairouan','Al Qaşrayn':'Kasserine','Kébili':'Kebili','Le Kef':'Kef','Al Mahdīyah': 'Mahdia',
+        'La Manouba':'Manouba','Djerba':'Medenine','Madanīn':'Medenine','Médenine':'Medenine','Médenine':'Medenine','.':'Monastir','Tabarka':'Jendouba',
+        'Hammamet':'Nabeul','Nābul':'Nabeul','Şafāqis':'Sfax','.':'Sidi Bouzid','..':'Siliana','Sūsah':'Sousse','...':'Tataouine','':'Tozeur','Tūnis':'Tunis','Gammarth':'Tunis','':'Zaghouan'}
+     
+     if self.ville:
+      self.ville=self.ville.rstrip()
+      if self.ville=="Jardins de Carthage":self.state="Tunis"
+      if "Hammamet" in self.ville: self.state="Nabeul"
+
+     if self.state:
+       if "Manouba" in self.state: self.state="Manouba"
+       if "Kef" in self.state: self.state="Kef"
+       if "Gab" in self.state: self.state="Gabes"
+       if "Béj" in self.state: self.state="Beja"
+       if "Médenine" in self.state: self.state="Medenine"
+       if "rous" in self.state: self.state="Ben Arous"
+       if "Ben" in self.state: self.state="Ben Arous"
+
+     if self.state and self.state in states_of_tunisia:
+      #  skipped+=1
+       pass
+     
+     elif self.state and self.state in states_mapping:
+               self.state = states_mapping.get(self.state)
+
+     elif self.ville and self.ville in states_of_tunisia:
+       self.state=self.ville
+      #  villseisstate+=1
+     elif self.ville or self.zone:
+      if not self.ville and self.zone:
+          self.ville=self.zone
+
+      if self.ville and not self.state:
+          pattern = r'\d+'
+          self.ville= re.sub(pattern, '', self.ville)
+          self.state=self.get_state(self.ville,"Tunisia")
+          getstate+=1
+     
+      if self.state and self.state not in  states_of_tunisia:
+          #check mapping
+          if self.state in states_mapping and self.state not in  states_of_tunisia:
+               self.state = states_mapping.get(self.state)
+         
+          if self.state not in states_of_tunisia:
+             getstate+=1
+             self.state=self.get_state(self.state,"Tunisia")
+             
+             if self.state in states_mapping and self.state not in  states_of_tunisia:
+               self.state = states_mapping.get(self.state)
+
+      if not self.state or self.state not in states_of_tunisia and self.zone:
+             if not self.ville or self.ville!=self.zone:
+              getstate+=1
+              self.state=self.get_state(self.zone,"Tunisia")
+             
+             if self.state in states_mapping and self.state not in  states_of_tunisia:
+               self.state = states_mapping.get(self.state)
+  
+      if self.state and self.state in states_mapping:
+               self.state = states_mapping.get(self.state)
+
+      if self.ville:
+       if self.ville=="Jardins de Carthage":self.state="Tunis"
+       if "Hammamet" in self.ville: self.state="Nabeul"
+      
+
+       if self.state:
+        if "Manouba" in self.state: self.state="Manouba"
+        if "Kef" in self.state: self.state="Kef"
+        if "Gab" in self.state: self.state="Gabes"
+        if "Béj" in self.state: self.state="Beja"
+        if "Médenine" in self.state: self.state="Medenine"
+        if "rous" in self.state: self.state="Ben Arous"
+        if "Ben" in self.state: self.state="Ben Arous"
+
+
+      if self.state and self.state not in  states_of_tunisia:
+       self.state=None
+      # if getstate>1:
+      #   time.sleep(2)
+      
+
+      
+     
+     return getstate
+    
+    
     def print_maison(self):
         print("Website:", self.website)
         print("URL:", self.url)
@@ -598,6 +751,9 @@ class BienImmobilier:
       text=" "
       newdescription=" "
       t=TransformationTexte()
+      
+
+
       if self.description:
           newdescription=newdescription+" "+str(self.description)
           test=1

@@ -102,10 +102,10 @@ class TayaraFailsSpider(scrapy.Spider):
      title = response.xpath('//title/text()').get()
      
      span=response.css('div.flex.items-center.space-x-1.mb-1 span::text').getall()
-     state,date=span[0].split(",")
+     state,date=span[1].split(",")
      adress=""
      if len(span)>2:
-         if "annonce(s)" in span[1]:
+         if "annonce(s)" in span[0]:
           adress=span[1]
      data = json.loads(response.xpath('//script[@id="__NEXT_DATA__"]/text()').extract_first())
      ad_data = data['props']['pageProps']['adDetails']
