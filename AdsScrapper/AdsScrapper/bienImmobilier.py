@@ -6,6 +6,7 @@ from transformationText import TransformationTexte
 from geopy.geocoders import GeoNames
 from geopy.exc import GeocoderUnavailable
 import time
+from bson import ObjectId
 
 
 class BienImmobilier:
@@ -884,6 +885,91 @@ class BienImmobilier:
         else:
             return False 
 
+    
+    def ReadbyId(self,id):
+        # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+        # db = client["AdsScrappers"]
+        # collection = db["Ads"]
+        object_id = ObjectId(id)
+
+        result = self.collection.find_one({'_id': object_id})
+        if result:
+            if 'website' in result:
+             self.website = result['website']
+
+            if 'url' in result:
+             self.url = result['url']
+
+            if 'code' in result:
+             self.code = result['_id']
+
+            if 'description'in result:
+             self.description = result['description']
+
+            if 'price'in result:
+             self.price = result['price']
+
+            if 'surfaceTotale' in result:
+             self.surfaceTotale = result['surfaceTotale']
+
+            if 'surface_habitable' in result:
+             self.surface_habitable = result['surface_habitable']
+
+            if 'adresse' in result:
+             self.adresse = result['adresse']
+
+            if 'country' in result:
+             self.country = result['country']
+
+            if 'state' in result:
+             self.state = result['state']
+
+            if 'zone' in result:
+             self.zone = result['zone']
+
+            if 'ville' in result:
+             self.ville = result['ville']
+
+            if 'etage' in result:
+             self.etage = result['etage']
+
+            if 'place_voiture' in result:
+             self.place_voiture = result['place_voiture']
+
+            if 'characteristicslist' in result:
+             self.characteristicslist = result['characteristicslist']
+
+            if 'nombre_de_chambre' in result:
+             self.nombre_de_chambre = result['nombre_de_chambre']
+
+            if 'nombre_de_piece' in result:
+             self.nombre_de_piece = result['nombre_de_piece']
+
+            if 'nombre_de_salle_de_bain' in result:
+             self.nombre_de_salle_de_bain = result['nombre_de_salle_de_bain']
+
+            if 'datescraped' in result:
+             self.datescraped = result['datescraped'] 
+
+            if  'dateinstered'in result:
+             self.dateinstered = result['dateinstered']
+
+            if  'datemodified'in result:
+             self.datemodified = result['datemodified']
+
+            if  'imagesurlslist'in result:
+             self.imagesurlslist = result['imagesurlslist']
+
+            if  'anneeconstruction'in result:
+             self.anneeconstruction = result['anneeconstruction']
+
+            if  'total_description'in result:
+             self.TotalDescp=result['total_description']
+            return True          
+        else:
+            return False 
+
+
 
     def readAll(self):
         # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
@@ -901,8 +987,8 @@ class BienImmobilier:
              BI.website = result['website']
             if 'url'in result:
              BI.url = result['url']
-            if 'code'in result:
-             BI.code = result['code']
+            if '_id'in result:
+             BI.code = result['_id']
             if 'description'in result:
              BI.description = result['description']
             if 'price'in result:

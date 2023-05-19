@@ -1,115 +1,240 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html>
-    <head>
+    
 
+
+      <head>
+        <title>Vente Immobilier</title>
+        <link rel="icon" href="{% static 'logo.png' %}" type="image/png">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="{% static 'styles.css' %}">
-        <title>
-            Site
-        </title>
-    </head>
-    <body>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="#">Vente immobilier </a>
+ 
+        <link rel="stylesheet" href="{% static 'style.css' %}">
+        <link rel="stylesheet" href="{% static 'index.css' %}">
       
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="">Home <span class="sr-only">(current)</span></a>
-            </li>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> 
+        
+        <style>
+          input[type="submit"].Rechercher {
+            /* Default styles */
+            background-color: black;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+          }
+      
+          input[type="submit"].Rechercher:hover {
+            /* Hover styles */
+            transform: scale(1.05);
+          }
+          a { transition: transform 0.3s ease;
+            }
+
+            a:hover {
+              transform: scale(1.05); /* Increased font size on hover */
+            }
+            .profile{font-size:20px; color:white
+
+
+            }
+            i:hover{font-size:25px;
+
+            }
+            .fas.fa-chevron-up:hover
+            {background-color: rgb(165, 165, 165);
+            }
+            .fas.fa-chevron-down:hover
+            {background-color: rgb(165, 165, 165);
+            }
+            .input-group {
+                  display: flex;
+                  gap: 10px;
+                }
+
+                .form-group {
+                  margin-bottom: 10px;
+                }
+
+                .price {
+                  display: inline-block;
+                  width: 60px;
+                }
+                .btn.btn-primary
+                {transition: transform 0.3s ease;}
+                .btn.btn-primary:hover
+                { transform: scale(1.05);}
             
-            <li class="nav-item">
-              <a class="nav-link" href="Accueil.html" tabindex="-1" >log out</a>
-            </li>
-            
+
+        </style>
+      
+      
+      </head>
+      
+
+
+    <body style="background-color: #ffffff;">
+      
+      <div class="">
+        <nav class="navbar-expand-lg"  style="background-color: black; height: 100px; padding-top: 0;">
+           <div class="container" style="background-color: black; " >
+             <a class="logo" href="index.html"><img src="{% static 'logo.png' %}" style="height: 50px;margin-top: 10px; margin-left: -12em;"></a>
+             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+               <ul class="navbar-nav mr-auto">
+                 <li class="nav-item"><a class="nav-link" href="#" style="margin-top: 20px;margin-left:-30em;">Home</a></li>
+                 <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left: -20em;">Statéstique{{authorid}}{{authorname}}{{ request.user.username }}</a></li>
+               </ul>
+              <form style="margin-top: 20px;"><ul><li><a class="profile" href="shop.html"style="font-size:20px; color:white"><i class="fas fa-user"></i></a></li>
+                   </ul>
               
-          </ul>
-        </div>
-      </nav>
+             </form>
+              </div>    
+         </nav>
+      </div>
       
+      <br>
      
   
     
   </div>
+ 
+  <div style="border: 1px solid black; height: 250px; width: 600px; margin-left: 30%;">
+    <br>
       <form>
-        <label for="search">Rechercher :</label>
-        <input type="text" id="search" name="search">
-        <input type="submit" value="Rechercher">
+        <label for="search"></label>
+        <input type="text" id="search" name="search" placeholder="Rechercher" required>
+        <button type="submit" class="Rechercher" style="background-color:transparent; font-size: 30px; margin-top: -1em;"><i class="fas fa-search"></i></button>
       </form>
-      <br><br>
-      <form method="GET" action="{% url 'sort' %}">
-      
-        <span class="price">Prix</span>
-        <div class="button-container">
-          <button class="up-arrow" type="submit" name="up-arrow">↑</button>
-          <button class="down-arrow" type="submit" name="down-arrow">↓</button>
-        </div>
-        <span class="price">Date</span>
-        <div class="button-container">
-          <button class="up-arrow" type="submit" name="old">↑</button>
-          <button class="down-arrow" type="submit" name="new">↓</button>
-        </div>
-    </form>
-    <br><br><br>
+      <br>
     <form method="POST" action="{% url 'filter' %}">
-      {% csrf_token %} 
-      <label for="min_price">Price:</label>
-      <input type="number" name="min_price" id="min_price" placeholder="Min"><span> &nbsp; &nbsp; </span>
-      <input type="number" name="max_price" id="max_price" placeholder="Max"><span> &nbsp; &nbsp; </span>
-      <select name="state">
-        <option disabled selected value> -- select an option -- </option>
-
-        {% for item in state %}
-          <option value="{{item}}">{{item}}</option>
-        {% endfor %}
-      </select>
-    <button class="down-arrow" type="submit" name="new">Find</button>
-   </form>
-   <br><br>
-      <div id="bot" class="container-lg" style="margin-top:20px ;"class="row">
-        <div class="card-deck">
-          {% autoescape on %}
-          {% for item in data %}
-          <div id="im0" class="col-4">
-              {% if item.imagesurlslist %}
-              {% if item.website == "facebook.com"%}
-              <img src="{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
-              {% elif item.website == "remax.com.tn" or item.website == "tayara.tn" or item.website == "bnb.tn"%}
-              <img src="{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
-              
-              {% else %}
-              <img src="http://{{item.imagesurlslist|first|default:''|safe}}" class="card-img-top" style="height:195px;width: 350px; " alt="">
-              {% endif %}
-              {% else %}
-              <img src="https://atlas-content-cdn.pixelsquid.com/stock-images/simple-house-NxE5a78-600.jpg" class="card-img-top" style="height:195px;width: 350px;" alt="">
-              {% endif %}
-              <div class="card-body">
-                  <h5>{{ item.website|safe }}{{ item.ville|safe }} | {{ item.price|safe }} TND</h5>
-                  <p class="card-text">{{ item.description|slice:":50"|safe}}...</p>
-                  <a href="{{ item.url|safe }}" class="Carte">site original</a>
-              </div>
+      {% csrf_token %}
+      <div class="form-group">
+        <div class="input-group">
+          <span for="min_price" class="price" style="font-size:15px; margin-right: -1em;">Price:</span>
+            <input type="number" name="min_price" id="min_price" class="form-control" placeholder="Min" style="width: 150px;">
+            <input type="number" name="max_price" id="max_price" class="form-control" placeholder="Max"style="width: 150px;">
           </div>
+         <div class="input-group" style="margin-top: 10px;">
+        <select name="state" class="form-control" required>
+          <option disabled selected value> --State-- </option>
+          {% for item in state %}
+            <option value="{{item}}">{{item}}</option>
           {% endfor %}
-          {% endautoescape %}
+        </select>
+        <button class="btn btn-primary" type="submit" name="new" style="width: 150px; background-color: black; height: 36px;border: 1px solid black;">Find</button>
+      </div>
       </div>
       
-      {% if data.has_other_pages %}
-      <div class="pagination">
-          {% if data.has_previous %}
-          <a href="?page={{ data.previous_page_number }}"> previous </a>
-          {% endif %}
-      
-          <span>    </span>
-      
-          {% if data.has_next %}
-          <a href="?page={{ data.next_page_number }}">    ---- next </a>
-          {% endif %}
+    </form>
+
+    <form method="POST" action="{% url 'Clearfilter' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        
+         <div class="input-group" style="margin-top: 10px;">
+        
+        <input type="submit" value="X Clear Filters" name="filter" style="width: 150px; background-color: transparent; height: 36px; color: black;">
       </div>
-      {% endif %}
+      </div>
+      
+    </form>
+     
+     
+  </div>     
+   <div class="design_section layout_padding" style="margin-top: -7em;">
+          <div id="my_slider" class="carousel slide" data-ride="carousel" >
+                  <div class="carousel-inner" >
+                            <div class="carousel-item active" >
+                                      <div class="container">
+                                              <div class="design_section_2" >
+                                                
+                                                                            <form method="GET" action="{% url 'sort' %}" style="margin-right: -65em;">
+                                                                    
+                                                                              <span class="price">Prix</span>
+                                                                              <div class="button-container">
+                                                                                <button class="fas fa-chevron-up" type="submit" name="up-arrow"></button>
+                                                                                <button class="fas fa-chevron-down" type="submit" name="down-arrow"></button>
+                                                                              </div>
+                                                                              <span class="price">Date</span>
+                                                                              <div class="button-container">
+                                                                                <button class="fas fa-chevron-up" type="submit" name="old"></button>
+                                                                                <button class="fas fa-chevron-down" type="submit" name="new"></button>
+                                                                              </div>
+                                                                            </form>
+                                                                    <div class="row">
+                                                                    {% autoescape on %}
+                                                                    {% for item in data %}
+                                                                      <div class="col-md-4" style="margin-top: 20px;">
+                                                                        <div class="box_main" style=" border-color: black; height: 500px;">
+                                                                          <div class="image_3" href="#">
+                                                                            {% if item.imagesurlslist %}
+                                                                            {% if item.website == "facebook.com"%}
+                                                                            <img src="{{item.imagesurlslist|first|default:''|safe}}" style="height:195px;width: 350px; ">
+                                                                            {% elif item.website == "remax.com.tn" or item.website == "tayara.tn" or item.website == "bnb.tn"%}
+                                                                            <img src="{{item.imagesurlslist|first|default:''|safe}}" style="height:195px;width: 350px; ">
+                                                                            
+                                                                            {% else %}
+                                                                            <img src="http://{{item.imagesurlslist|first|default:''|safe}}" style="height:195px;width: 350px; ">
+                                                                            {% endif %}
+                                                                            {% else %}
+                                                                            <img src="https://atlas-content-cdn.pixelsquid.com/stock-images/simple-house-NxE5a78-600.jpg" style="height:195px;width: 350px; ">
+                                                                            {% endif %}
+                                                                          
+                                                                            {% if item.ville %}
+                                                                            <small style="font-size: 15px; color: black; margin-top: -5em;"><i class="fas fa-map-marker-alt"></i> {{ item.ville|safe }}</small>
+                                                                            {% else %}
+                                                                            <small style="font-size: 15px; color: black; margin-top: -5em;"><i class="fas fa-map-marker-alt"></i>--</small>
+                                                                            {% endif %}
+                                                                            <br>
+                                                                            {% if item.price %}
+                                                                            <small style="font-size: 15px; color: black;"><i class="fas fa-dollar-sign"></i> {{ item.price|safe }} TND</small>
+                                                                            {% else %}
+                                                                            <small style="font-size: 15px; color: black;"><i class="fas fa-dollar-sign"></i>--</small>
+                                                                            {% endif %}
+                                                                          </div>
+
+                                                                            
+                                                                            
+                                                                            <p class="chair_text" style="color:black; font-size: 15px;">{{ item.code|safe}}{{ item.description|slice:":50"|safe}}...</p>
+                                                                            <div class="buy_bt"><a href="{% url 'details' %}?item={{ item.code|urlencode }}" style="background-color: black; border: 1px solid black;">Details </a></div>
+                                                                        </div>
+                                                                      </div>
+                                                                    {% endfor %}
+                                                                    {% endautoescape %}             
+                                                                    </div><br><br>
+                                                                    
+                                                    
+                                                                    {% if data.has_other_pages %}
+                                                                      <div class="pagination" style="margin-left:45%;">
+                                                                          {% if data.has_previous %}
+                                                                          <a href="?page={{ data.previous_page_number }}"> <i class="fas fa-chevron-left"></i> </a>
+                                                                          {% endif %}
+                                                                      
+                                                                          
+                                                                          {% if data.has_next %}
+                                                                          <a href="?page={{ data.next_page_number }}" style="margin-left: 50px;"><i class="fas fa-chevron-right"></i></a>
+                                                                          {% endif %}
+                                                                      </div>
+                                                                      {% endif %}
+                                                </div>
+                                      </div>
+                            </div>
+                        
+                  </div>
+          </div>      
+ </div>
+
+
+
+    
+      
+      
       
       
 
