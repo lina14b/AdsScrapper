@@ -135,7 +135,7 @@ class TayaraFailsSpider(scrapy.Spider):
      if not transaction:
         transaction="**"
         
-     if "Ven" in transaction or not superficie:
+     if ("Ven" in transaction and superficie) or "terrain" in description.lower():
         print("added")
         b=BienImmobilier()
         b.extractTayara(row)

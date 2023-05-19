@@ -180,7 +180,7 @@ class TayaraSpider(scrapy.Spider):
            test=True
 
         
-     if "Ven" in transaction or test:
+     if ("Ven" in transaction and superficie) or "terrain" in description.lower():
         print("added")
         b=BienImmobilier()
         b.extractTayara(row)

@@ -1,0 +1,214 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+   <head>
+     
+      <title>Profile</title>
+      <link rel="icon" href="{% static 'logo.png' %}" type="image/png">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+      <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+      <link rel="stylesheet" href="{% static 'style.css' %}">
+      <link rel="stylesheet" href="{% static 'index.css' %}">
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> 
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+      <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{% static 'profile.min.css' %}">
+      
+      <link rel="stylesheet" href="{% static 'responsive.css' %}">
+      <link rel="stylesheet" href="{% static 'owl.carousel.min.css' %}">
+      <link rel="stylesheet" href="{% static 'owl.theme.default.min.css' %}">
+      <link rel="stylesheet" href="{% static 'jquery.mCustomScrollbar.min.css' %}">
+
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">      
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+      <style>
+        .edit{
+          width: 250px;
+          background-color: black;
+          height: 36px;
+          border: 1px solid black;
+          color: white;
+        }
+
+        .edit:hover {
+          background-color: rgb(46, 46, 46);
+        }
+        
+      </style>
+   </head>
+   <body>
+      <!-- header section start -->
+      <div class="">
+        <nav class="navbar-expand-lg"  style="background-color: black; height: 100px; padding-top: 0;">
+                         <div class="container" style="background-color: black; " >
+                          <a class="logo" href="{% url 'home' %}"><img src="{% static 'logo.png' %}" style="height: 50px;margin-top: 10px; margin-left:0px; margin-right:10px;width: 50px;"></a>
+                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                            </button>
+                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                  <ul class="navbar-nav mr-auto">
+                                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
+                                     <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Statéstique</a></li>
+                                  </ul>
+                         
+                                  <ul style="margin-top: 20px; margin-right:0px ;">
+                                  <li>
+                                     {% if request.user.is_authenticated %}
+                                     <a class="profile" href="{% url 'profile' %}"style="font-size:20px; color:white">{{ request.user.username }} <i class="fas fa-user"></i></a>
+                                     {% else %}
+                                     <a class="profile" href="{% url 'login_user' %}"style="font-size:20px; color:white"><i class="fas fa-user"></i></a>
+                                     {% endif %}
+                                  </li>
+                                  </ul>
+                         
+                         </div>    
+        </nav>
+     </div>
+     
+      <br><br>
+      <div class="container">
+         <div class="main-body">
+         
+         
+               <div class="row gutters-sm">
+                 <div class="col-md-4 mb-3">
+                   <div class="card">
+                     <div class="card-body" style="box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); background-color: rgb(252, 238, 243)">
+                       <div class="d-flex flex-column align-items-center text-center">
+                         <img src="{% static 'user.png' %}" alt="Admin" class="rounded-circle" width="150">
+                         <div class="mt-3">
+                           <h6>{{ request.user.first_name}}&nbsp;{{ request.user.last_name}}</h6>
+                           <h6><i class="fas fa-envelope"></i>&nbsp;{{ request.user.email}}</h6>
+                           
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                   
+                   <div class="card mt-3"style="box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); background-color: rgb(252, 238, 243)">
+                    <br>
+                    <form method="POST" action="{% url 'filter' %}">
+                      {% csrf_token %}
+                      <div class="form-group">
+                                <div class="input-group">
+                                 <span for="min_price" class="price" style="font-size:15px;margin-top: 10px;">Price:</span>
+                                  <input type="number" name="min_price" id="min_price" class="form-control" placeholder="Min" style="width: 100px;">
+                                  &nbsp; <input type="number" name="max_price" id="max_price" class="form-control" placeholder="Max"style="width: 100px;">
+                                </div>
+                          <br>
+                                <div class="input-group">
+                                  <span for="min_price" class="price" style="font-size:15px; margin-top: 10px;">Surface:</span>
+                                  <input type="number" name="max_price" id="max_price" class="form-control" placeholder="Max"style="width: 100px;">
+                                </div>
+                          <br>
+                                <div class="input-group" style="margin-top: 10px;">
+                                  <select name="state" class="form-control" required>
+                                    <option disabled selected value> --State-- </option>
+                                    {% for item in state %}
+                                      <option value="{{item}}">{{item}}</option>
+                                    {% endfor %}
+                                  </select>
+                                </div>
+                                <br>
+                                <div class="input-group">
+                                    <button class="edit" type="submit" name="new" >Find</button>
+                                </div>
+                         
+                        </div>
+                      
+                    </form>
+                     
+                   </div>
+                 </div>
+                 <div class="col-md-8">
+                   <div class="card mb-3">
+                     <div class="card-body">
+                       <div class="row">
+                            <div class="col-sm-3">
+                              <h4 class="mb-0">Prix</h4>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                              <input type="number" name="min_price" id="min_price" class="form-control" placeholder="Min" style="width: 150px;">
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                              <input type="number" name="min_price" id="min_price" class="form-control" placeholder="Min" style="width: 150px;">
+                            </div>
+                         
+                       </div>
+                       <hr>
+                       <div class="row">
+                        <div class="col-sm-3">
+                          <h4 class="mb-0">00</h4>
+                        </div>
+                     </hr>
+                       
+                        <div class="col-sm-9 text-secondary">
+                         <input type="number" name="min_price" id="min_price" class="form-control" placeholder="Min" style="width: 150px;">
+                        </div>
+                     
+                        
+                      </div>
+                       <hr>
+                       <div class="row">
+                         <div class="col-sm-3">
+                           <h4 class="mb-0">Surface</h4>
+                         </div>
+                         <div class="col-sm-9 text-secondary">
+                          
+                          </div>
+                         <div class="col-sm-9 text-secondary">
+                          
+                         </div>
+                       </div>
+                       <hr>
+                       <div class="row">
+                         <div class="col-sm-3">
+                           <h4 class="mb-0">Location</h4>
+                         </div>
+                         <div class="col-sm-9 text-secondary">
+                         
+                         </div>
+                       </div>
+                       <hr>
+                       
+                     </hr>
+                       <div class="row">
+                         <div class="col-sm-12">
+                           <a class="btn btn-info " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Edit</a>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+     
+                   
+                     
+                   </div>
+     
+     
+     
+                 
+               </div>
+     
+             </div>
+         </div>
+      <br>
+
+      <script src="js/jquery.min.js"></script>
+      <script src="js/popper.min.js"></script>
+      <script src="js/bootstrap.bundle.min.js"></script>
+      <script src="js/jquery-3.0.0.min.js"></script>
+      <script src="js/plugin.js"></script>
+      <!-- sidebar -->
+      <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+      <script src="js/custom.js"></script>
+      <!-- javascript --> 
+      <script src="js/owl.carousel.js"></script>
+      <script src="https:cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+   </body>
+</html>

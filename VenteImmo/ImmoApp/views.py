@@ -193,6 +193,8 @@ def details(request):
    
    return render(request, 'item.html', {'item': b})
 
+def profile(request):
+   return render(request,"profile.html", {'state':ville})
 
 def userauth(request):
   return render(request,"user.html")

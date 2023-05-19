@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 from pymongo import MongoClient
+import pymongo
+
 from datetime import datetime, timedelta
 from transformationText import TransformationTexte
 from geopy.geocoders import GeoNames
@@ -975,7 +977,9 @@ class BienImmobilier:
         # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
         # db = client["AdsScrappers"]
         # collection = db["Ads"]
-        cursor = self.collection.find({})
+        # cursor = self.collection.find({})
+        cursor = self.collection.find().sort('datescraped', pymongo.DESCENDING)
+
         datas = list(cursor)
         ListAll=[]
 

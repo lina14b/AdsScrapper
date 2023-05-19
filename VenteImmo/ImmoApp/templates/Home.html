@@ -81,19 +81,30 @@
       <div class="">
         <nav class="navbar-expand-lg"  style="background-color: black; height: 100px; padding-top: 0;">
            <div class="container" style="background-color: black; " >
-             <a class="logo" href="index.html"><img src="{% static 'logo.png' %}" style="height: 50px;margin-top: 10px; margin-left: -12em;"></a>
+             <a class="logo" href="index.html"><img src="{% static 'logo.png' %}" style="height: 50px;margin-top: 10px; margin-left:0em;width: 50px;"></a>
              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-               <ul class="navbar-nav mr-auto">
-                 <li class="nav-item"><a class="nav-link" href="#" style="margin-top: 20px;margin-left:-30em;">Home</a></li>
-                 <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left: -20em;">Statéstique{{authorid}}{{authorname}}{{ request.user.username }}</a></li>
-               </ul>
-              <form style="margin-top: 20px;"><ul><li><a class="profile" href="shop.html"style="font-size:20px; color:white"><i class="fas fa-user"></i></a></li>
-                   </ul>
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
+                  <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Statéstique</a></li>
+                </ul>
+                
+                <ul style="margin-top: 20px; margin-right:0px ;">
+                 <li>
+                   {% if request.user.is_authenticated %}
+                   <a class="profile" href="{% url 'profile' %}"style="font-size:20px; color:white">{{ request.user.username }} <i class="fas fa-user"></i></a>
+                   {% else %}
+                   <a class="profile" href="{% url 'login_user' %}"style="font-size:20px; color:white"><i class="fas fa-user"></i></a>
+                   {% endif %}
+                 </li>
+                </ul>
+               
+
+               
               
-             </form>
+           
               </div>    
          </nav>
       </div>
