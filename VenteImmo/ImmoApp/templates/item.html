@@ -151,7 +151,7 @@
                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
                                     <ul class="navbar-nav mr-auto">
                                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
-                                       <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Statéstique</a></li>
+                                       <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
                                     </ul>
                            
                                     <ul style="margin-top: 20px; margin-right:0px ;">
@@ -176,7 +176,7 @@
          <div class="container" >
  
                <div class="row" style="display: flex; flex-direction: column;  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); background-color: rgb(244, 228, 234)">
-                  <div class="slideshow-container" style=" display: grid;place-items: center; width: 100% ;margin-top: 50px; ">
+                  <div class="slideshow-container" style=" display: grid;place-items: center; width: 100% ;margin-top: 50px;  z-index: 1;">
                    {% if item.imagesurlslist %}
                            {% for link in item.imagesurlslist %}
                               <div class="mySlides" style="box-shadow: 0 10px 10px rgba(0, 0, 0, 0);">
@@ -198,10 +198,19 @@
                            <img src="https://atlas-content-cdn.pixelsquid.com/stock-images/simple-house-NxE5a78-600.jpg">
                            </div>
                   {% endif %}
-                  
-                 </div>
 
-                 
+                 </div>
+                 {% if request.user.is_authenticated %}
+                     {% if saved %}
+                        
+                           <a href="#" style=" text-align:center ;background-color: rgba(255, 255, 255, 0.61);color: rgb(0, 0, 0); font-size: 24px; width: 50px; margin-left: 800px; margin-top: -1em;  z-index: 2;"><i class="fas fa-star"></i></i></a>
+                           {%else%} 
+                           <a href="{% url 'addtosaved' %}?item={{ item.code|urlencode }}" style=" text-align:center ;background-color: rgba(255, 255, 255, 0.61);color: rgb(0, 0, 0); font-size: 24px; width: 50px; margin-left: 800px; margin-top: -1em;  z-index: 2;"><i class="far fa-star"></i></i></a>
+
+                           {% endif %}
+
+                  
+                 {% endif %}
                  <p> <i class="fas fa-map-marker-alt"></i> {% if item.ville %} {{item.ville}}, {% endif %}{% if item.zone and not item.zone == item.ville %} {{item.zone}}, {% endif %}{% if item.state %} {{item.state}}, {% endif %} {{item.country}} {% if item.dateinstered %} - {{item.dateinstered}} {% endif %}</p> 
 
                  <div style="display: flex; flex-direction: row; flex-wrap: wrap; ">

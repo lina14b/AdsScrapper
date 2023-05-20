@@ -3,6 +3,7 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
+from django.urls import reverse
 from pymongo import MongoClient
 from django.http import HttpResponse
 from django.template import loader
@@ -22,6 +23,10 @@ import time
 import pandas as pd
 sys.path.append('C:/Users/Lina/Desktop/AdsScrapper/AdsScrapper/AdsScrapper/AdsScrapper')
 from bienImmobilier import BienImmobilier
+from user import User
+from Ads_recherche_text import Recherche
+
+
 
 def ImmoApp(request):
   template = loader.get_template('Home.html')
@@ -30,11 +35,11 @@ def ImmoApp(request):
 
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-
+user=User()
 my_data = []
 my_dataBU = []
 ville= ['Ariana','Beja','Ben Arous','Bizerte','Gabes','Gafsa','Jendouba','Kairouan','Kasserine','Kebili','Kef', 'Mahdia','Manouba','Medenine','Monastir','Nabeul','Sfax','Sidi Bouzid','Siliana','Sousse','Tataouine','Tozeur','Tunis','Zaghouan']
-
+r=Recherche()
 def populate_data():
     b=BienImmobilier()
     global my_data
@@ -57,10 +62,22 @@ def populate_data():
              continue
 
 def index(request):
+        global my_data
         author_id = request.user.id
         authorname = request.user.username
         print("\n*******")
         print("\n*******",author_id)
+        res=None
+        if request.method == 'POST':
+         search = request.POST.get('search')
+         res=r.search_text(search)
+         
+          
+        if not res:res=my_data
+        my_data=res
+        
+
+
         if not my_data:
             print("populate data")
             populate_data()
@@ -84,10 +101,11 @@ def index(request):
         except EmptyPage:
             data = paginator.page(paginator.num_pages)
 
-        # Cache the data
+        # Cache the data 
         # cache.set(f'my_data_{page_number}', data,timeout=3600)
        
-    
+        
+
         return render(request, 'Home.html', {'data': data, 'page': page_number,'state':ville,'authorid':author_id,'authorname':authorname })
 
 def sort(request):
@@ -185,19 +203,62 @@ def Clearfilter(request):
 def details(request):
    author_id = request.user.id
    authorname = request.user.username
+   print(user.email)
    b=BienImmobilier()
    id = request.GET.get('item')
    print(id)
    b.ReadbyId(id)
    print(b.url)
-   
-   return render(request, 'item.html', {'item': b})
+   user.readone(request.user.id)
+   print(user.savedIds)
+   saved=id in user.savedIds
+     
+   return render(request, 'item.html', {'item': b,'user':user,'saved':saved})
 
 def profile(request):
-   return render(request,"profile.html", {'state':ville})
+   global user 
+   print("----------------------------------------")
+   if request.method == 'POST':
+        min_price = request.POST.get('min_price')
+        max_price = request.POST.get('max_price')
+        min_surf = request.POST.get('min_surf')
+        max_surf = request.POST.get('max_surf')
+        villes = request.POST.get('ville')
+        states = request.POST['state'] 
+
+        test=user.readone(request.user.id)
+
+        u=User(request.user.id,request.user.email,min_price,max_price,min_surf,max_surf,states,villes,user.saved,user.savedIds)
+        
+        if test:u.update()
+        else:u.save()
+   
+   if not request.user.is_authenticated:
+      return redirect('login_user')
+   else: 
+      user.readone(request.user.id)
+      
+   
+
+   return render(request,"profile.html", {'state':ville,'user':user})
+
+def removesaved(request):
+   global user 
+   user.readone(request.user.id)
+   user.id=request.user.id
+   user.RemoveSaved(user,request.GET.get('item'))
+   return redirect('profile')
+
+def addtosaved(request):
+   global user 
+   user.readone(request.user.id)
+   user.id=request.user.id
+   user.AddSaved(user,request.GET.get('item'))
+   id="?item="+request.GET.get('item')
+   return redirect(reverse('details') +id)
 
 def userauth(request):
-  return render(request,"user.html")
+  return render(request,"profile.html")
 
 def register(request):
  
@@ -232,7 +293,7 @@ def login_user(request):
 
     if user is not None:
       auth.login(request, user)
-      return redirect('userauth')
+      return redirect('profile')
     else: 
       messages.info(request, 'Invalid Username or Password')
       return redirect('login_user')
@@ -243,7 +304,7 @@ def login_user(request):
 
 def logout_user(request):
   auth.logout(request)
-  return redirect('userauth')
+  return render(request,"login.html")
 
   
 

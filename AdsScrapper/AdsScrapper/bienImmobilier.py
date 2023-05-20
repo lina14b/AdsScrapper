@@ -16,6 +16,7 @@ class BienImmobilier:
     db = client["AdsScrappers"]
     collection = db["Ads"]
     collectionH = db["AdsHistorisation"]
+    
     def __init__(self):
         self.website = None
         self.url = None
@@ -42,6 +43,8 @@ class BienImmobilier:
         self.anneeconstruction = None
         self.TotalDescp=None
         self.tokens=[]
+        
+        
    
     def extractRemax(self,row):
         print("\nhere")
@@ -746,6 +749,9 @@ class BienImmobilier:
         #self.total_description()
 
     def SaveDb(self,BI):
+      from user import User
+      u=User()
+
      # Set up a MongoDB client to connect to your Atlas cluster
       # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
       # # Access a database and a collection
@@ -784,7 +790,12 @@ class BienImmobilier:
       property_dict = BI.__dict__
       filtered_dict = {k: v for k, v in property_dict.items() if v is not None}
       result = self.collection.insert_one(filtered_dict)
-      print("added")
+      inserted_id = str(result.inserted_id)
+      print("Inserted document ID:", inserted_id)
+      
+      u.Notify(BI,inserted_id)
+      
+    
       self.SaveDb_Historisation()
     
     def SaveDb_Historisation(self):
@@ -902,7 +913,7 @@ class BienImmobilier:
             if 'url' in result:
              self.url = result['url']
 
-            if 'code' in result:
+            if '_id' in result:
              self.code = result['_id']
 
             if 'description'in result:
@@ -977,8 +988,9 @@ class BienImmobilier:
         # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
         # db = client["AdsScrappers"]
         # collection = db["Ads"]
-        # cursor = self.collection.find({})
-        cursor = self.collection.find().sort('datescraped', pymongo.DESCENDING)
+        cursor = self.collection.find({})
+        # cursor = self.collection.find().sort('datescraped', pymongo.DESCENDING).limit(14500)
+
 
         datas = list(cursor)
         ListAll=[]
@@ -1038,8 +1050,9 @@ class BienImmobilier:
             if 'total_description'in result:
              BI.TotalDescp=result['total_description']
             ListAll.append(BI.__dict__)
+        sorted_data = sorted(ListAll, key=lambda x: x['datescraped'])
 
-        return ListAll 
+        return sorted_data 
     
     
     def readAll_TA_TV(self):

@@ -2,6 +2,7 @@ from bienImmobilier import BienImmobilier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_distances
 from transformationText import TransformationTexte
+
 import pandas as pd
 class Recherche:
     def __init__(self):
@@ -23,7 +24,7 @@ class Recherche:
         df = pd.DataFrame(self.list2)
         df['distances']=flat_list
         df_sorted = df.sort_values('distances', ascending=True)
-        return df_sorted
+        return df_sorted.values.tolist()
     
     # def search_price(self, min_price, max_price):
     #     return [d for d in self.data if min_price <= d['price'] <= max_price]

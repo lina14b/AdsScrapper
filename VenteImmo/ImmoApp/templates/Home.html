@@ -88,9 +88,8 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                   <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
-                  <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Statéstique</a></li>
-                </ul>
-                
+                  <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
+                </ul>            
                 <ul style="margin-top: 20px; margin-right:0px ;">
                  <li>
                    {% if request.user.is_authenticated %}
@@ -99,12 +98,7 @@
                    <a class="profile" href="{% url 'login_user' %}"style="font-size:20px; color:white"><i class="fas fa-user"></i></a>
                    {% endif %}
                  </li>
-                </ul>
-               
-
-               
-              
-           
+                </ul> 
               </div>    
          </nav>
       </div>
@@ -117,7 +111,7 @@
  
   <div style="border: 1px solid black; height: 250px; width: 600px; margin-left: 30%;">
     <br>
-      <form>
+      <form method="POST" action="{% url 'home' %}">{% csrf_token %}
         <label for="search"></label>
         <input type="text" id="search" name="search" placeholder="Rechercher" required>
         <button type="submit" class="Rechercher" style="background-color:transparent; font-size: 30px; margin-top: -1em;"><i class="fas fa-search"></i></button>
@@ -182,7 +176,7 @@
                                                                     {% autoescape on %}
                                                                     {% for item in data %}
                                                                       <div class="col-md-4" style="margin-top: 20px;">
-                                                                        <div class="box_main" style=" border-color: black; height: 500px;">
+                                                                        <div class="box_main" style=" border-color: black; height: 520px;">
                                                                           <div class="image_3" href="#">
                                                                             {% if item.imagesurlslist %}
                                                                             {% if item.website == "facebook.com"%}
@@ -212,7 +206,7 @@
 
                                                                             
                                                                             
-                                                                            <p class="chair_text" style="color:black; font-size: 15px;">{{ item.code|safe}}{{ item.description|slice:":50"|safe}}...</p>
+                                                                            <p class="chair_text" style="color:black; font-size: 15px;">{{ item.description|slice:":50"|safe}}...</p>
                                                                             <div class="buy_bt"><a href="{% url 'details' %}?item={{ item.code|urlencode }}" style="background-color: black; border: 1px solid black;">Details </a></div>
                                                                         </div>
                                                                       </div>
