@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import json
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
@@ -25,6 +25,7 @@ sys.path.append('C:/Users/Lina/Desktop/AdsScrapper/AdsScrapper/AdsScrapper/AdsSc
 from bienImmobilier import BienImmobilier
 from user import User
 from Ads_recherche_text import Recherche
+from datetime import timedelta
 
 
 
@@ -38,15 +39,23 @@ CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 user=User()
 my_data = []
 my_dataBU = []
-ville= ['Ariana','Beja','Ben Arous','Bizerte','Gabes','Gafsa','Jendouba','Kairouan','Kasserine','Kebili','Kef', 'Mahdia','Manouba','Medenine','Monastir','Nabeul','Sfax','Sidi Bouzid','Siliana','Sousse','Tataouine','Tozeur','Tunis','Zaghouan']
+typeB= ['Villa','Appartement','Terrain','Maison','Commercial','Autre','Dépôt','Bureau']
+ville=[]
+state= ['Ariana','Beja','Ben Arous','Bizerte','Gabes','Gafsa','Jendouba','Kairouan','Kasserine','Kebili','Kef', 'Mahdia','Manouba','Medenine','Monastir','Nabeul','Sfax','Sidi Bouzid','Siliana','Sousse','Tataouine','Tozeur','Tunis','Zaghouan']
 r=Recherche()
+msg=""
+i=0
+my_data = cache.get('my_data')
+
 def populate_data():
     b=BienImmobilier()
     global my_data
     global my_dataBU
+    global ville
     
     my_data = b.readAll()
     my_dataBU=my_data
+    ville=b.getvilles(my_dataBU)
     print("done")
     time.sleep(10)
     date_format1 = '%d-%m-%Y %H:%M:%S'
@@ -62,15 +71,23 @@ def populate_data():
              continue
 
 def index(request):
+        global msg
+        global i
+        if i==1:
+           i=0
+        else:
+           msg=""
         global my_data
         author_id = request.user.id
         authorname = request.user.username
         print("\n*******")
         print("\n*******",author_id)
         res=None
+        search=""
         if request.method == 'POST':
          search = request.POST.get('search')
          res=r.search_text(search)
+         search="Results for "+search+":"
          
           
         if not res:res=my_data
@@ -81,14 +98,12 @@ def index(request):
         if not my_data:
             print("populate data")
             populate_data()
+            cache.set('my_data', my_data,3600)
         page_number = request.GET.get('page', 1)
         page_number = int(page_number)
-        # cached_data = cache.get(f'my_data_{page_number}')
+        
         data=[]
-    # if cached_data is not None:
-    #     # Use the cached data
-    #     data = cached_data
-    # else:
+    
         
         page_size = 21
 
@@ -101,93 +116,76 @@ def index(request):
         except EmptyPage:
             data = paginator.page(paginator.num_pages)
 
-        # Cache the data 
-        # cache.set(f'my_data_{page_number}', data,timeout=3600)
-       
-        
+      
 
-        return render(request, 'Home.html', {'data': data, 'page': page_number,'state':ville,'authorid':author_id,'authorname':authorname })
+        return render(request, 'Home.html', {'data': data, 'page': page_number,'state':state,'authorid':author_id,'authorname':authorname,'search':search,'msg':msg,'ville':json.dumps(ville) ,'typeB':typeB})
 
 def sort(request):
     global my_data
-    print(len(my_data))
-    print(my_data[10])
-    item=my_data[10]
-    print(item['datescraped'])
-    print(type(item['dateinstered']))
-    print("...")
-    i=0
-    for item in my_data[:1000]:
-     
-     if isinstance(item['dateinstered'], str):
-        print(i,item['dateinstered'])
-     i+=1
+    
+    b=BienImmobilier()
     data=[]
     if  my_data:
         if 'up-arrow' in request.GET:
-            for item in my_data:
-              if item['price'] is not None:
-                  if item['price']>1000 :
-                   data.append(item)
-            sorted_data = sorted(data, key=lambda x: x['price'])
-            my_data=sorted_data
-
-            print("up")
+            ###
+            my_data=b.sortprice(my_data,"up")
+            
         elif 'down-arrow' in request.GET:
-            for item in my_data:
-              if item['price'] is not None:
-                  if item['price']>1000 :
-                   data.append(item)
-                 
-            sorted_data = sorted(data, key=lambda x: x['price'], reverse=True)
-            my_data=sorted_data
+            my_data=b.sortprice(my_data,"down")
+            
         if 'old' in request.GET:
-            # for item in my_data:
-            #   if item['dateinstered'] is not None:
-            #     #   if item['price']>1000 :
-                #    data.append(item)
-            sorted_data = sorted(my_data, key=lambda x: x['datescraped'])
-            my_data=sorted_data
-
-            print("up")
+            my_data=b.sortdate(my_data,"up")
+            
         elif 'new' in request.GET:
-            # for item in my_data:
-            #   if item['price'] is not None:
-            #       if item['price']>1000 :
-            #        data.append(item)
-                 
-            sorted_data = sorted(my_data, key=lambda x: x['datescraped'], reverse=True)
-            my_data=sorted_data
-
-        
-
+            my_data=b.sortdate(my_data,"down")
+      
     return redirect(index)
 
 def filter(request):
     global my_data
+    global msg
     my_data=my_dataBU
-    
+    min = None
+    max = None
+    state = None
+    ville = None
+    typeb = None
+    b=BienImmobilier()
     new=[]
-    news=[]
     if request.method == 'POST':
         min = request.POST.get('min_price')
         max = request.POST.get('max_price')
-        ville = request.POST['state'] 
-        
-        print("++++++",ville)
-        if ville:
-         
-         if min and max:
-          print(min,max)
-          for item in my_data:      
-            if item["state"] and item["state"]==ville and item["price"] and item["price"] >=int(min) and item["price"] <=int(max):
-                 new.append(item)
-         else:
-            for item in my_data:
-             if item["state"] and item["state"]==ville:
-                new.append(item)
- 
+        state = request.POST.get('state')
+        ville = request.POST.get('ville')
+        typeb = request.POST.get('typeB')
+        print(request.POST)
+        print(ville,state,min,max,typeb)
+        new=b.filterdata(my_data,ville,state,min,max,typeb)
+    print("len",len(new))
+    if(len(new)==0):
+       new=my_dataBU
+       msg="No Ads found"
+       global i
+       i=1
+
     my_data=new
+        # print("***-----------------------******")
+        # print(request.POST)
+        
+        # print("++++++",state)
+        # if state:
+         
+        #  if min and max:
+        #   print(min,max)
+        #   for item in my_data:      
+        #     if item["state"] and item["state"]==state and item["price"] and item["price"] >=int(min) and item["price"] <=int(max):
+        #          new.append(item)
+        #  else:
+        #     for item in my_data:
+        #      if item["state"] and item["state"]==state:
+        #         new.append(item)
+ 
+    
 
               
     return redirect(index)
@@ -225,10 +223,12 @@ def profile(request):
         max_surf = request.POST.get('max_surf')
         villes = request.POST.get('ville')
         states = request.POST['state'] 
+        typ=request.POST['typeb'] 
+        print(typ)
 
         test=user.readone(request.user.id)
 
-        u=User(request.user.id,request.user.email,min_price,max_price,min_surf,max_surf,states,villes,user.saved,user.savedIds)
+        u=User(request.user.id,request.user.email,min_price,max_price,min_surf,max_surf,states,villes,typ,user.saved,user.savedIds)
         
         if test:u.update()
         else:u.save()
@@ -237,10 +237,13 @@ def profile(request):
       return redirect('login_user')
    else: 
       user.readone(request.user.id)
+      print("______",user.state)
+      print(user.ville,user.typeb)
+      print(ville)
       
    
 
-   return render(request,"profile.html", {'state':ville,'user':user})
+   return render(request,"profile.html", {'state':state,'user':user,'ville':ville,'typeB':typeB})
 
 def removesaved(request):
    global user 
@@ -306,5 +309,7 @@ def logout_user(request):
   auth.logout(request)
   return render(request,"login.html")
 
+def stats(request):
+  return render(request,"statistique.html")
   
 

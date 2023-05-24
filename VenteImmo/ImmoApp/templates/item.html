@@ -151,7 +151,7 @@
                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
                                     <ul class="navbar-nav mr-auto">
                                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
-                                       <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
+                                       <li class="nav-item"><a class="nav-link" href="{%url 'stats' %}" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
                                     </ul>
                            
                                     <ul style="margin-top: 20px; margin-right:0px ;">
@@ -224,6 +224,8 @@
                <div>
                  {% if item.description %}
                  <span style="color: black; font-size: 24px;  font-weight: bold; margin-left: 14px;">Détails:</span>
+                 <p style="color: black; font-size:16px;  ">{% if item.type %} <span style="color: black; font-size: 20px;  "></span>{{item.type}}: {% endif %}</p>  
+
                  <p style="color: black; font-size:16px;  ">{% if item.adresse %} <span style="color: black; font-size: 20px;  ">Adresse: </span>{{item.adresse}} {% endif %}</p>  
                  <p style="color: black; font-size:16px;  ">{% if item.description %} <span style="color: black; font-size: 20px;  ">Déscription: </span>{{item.description}} {% endif %}</p>  
 

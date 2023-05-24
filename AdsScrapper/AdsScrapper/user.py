@@ -11,7 +11,7 @@ class User:
     client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
     db = client["AdsScrappers"]
     collectionUser = db["User"]
-    def __init__(self,id=None,email=None,prixmin=None,prixmax=None,surfmin=None,surfmax=None,state=None,ville=None,saved=[],savedids=[]):
+    def __init__(self,id=None,email=None,prixmin=None,prixmax=None,surfmin=None,surfmax=None,state=None,ville=None,typeb=None,saved=[],savedids=[]):
         self.id = id
         self.email = email
         self.priceMin=prixmin
@@ -22,6 +22,8 @@ class User:
          self.state=state.lower()
         if ville:
          self.ville=ville.lower()
+        if typeb:
+         self.typeb=typeb.lower()
         self.saved = saved
         self.savedIds = savedids
     
@@ -36,6 +38,7 @@ class User:
         property_dict = self.__dict__
         filtered_dict = {k: v for k, v in property_dict.items() if v is not None}
         self.collectionUser.update_one({"id": self.id}, {"$set": filtered_dict}, upsert=True)
+        self.readone(self.id)
 
     def readone(self,id):
         result = self.collectionUser.find_one({'id': id})
@@ -65,6 +68,9 @@ class User:
 
             if 'ville'in result:
              self.ville = result['ville']
+            
+            if 'typeb'in result:
+             self.typeb = result['typeb']
 
             if 'saved'in result:
              self.savedIds = result['savedIds']
@@ -145,16 +151,16 @@ class User:
         u=one
         print(u)
         print(u.email)
-        # if u.state and im.state and u.state==im.state: teststate=True
-        # if u.priceMin and im.price and u.priceMin<=im.price:testpriceMin=True
-        # if u.priceMax and im.price and u.priceMax>=im.price:testpriceMax=True
-        # if u.surfaceMin and im.surfaceTotale and u.surfaceMin<=im.surfaceTotale:testsurfeMin=True
-        # if u.surfaceMax and im.surfaceTotale and u.surfaceMax>=im.surfaceTotale:testsurfeMax=True
-        # if u.ville and im.ville and u.ville==im.ville:testville=True        
-        # if u.ville and im.zone and u.zone==im.zone:zone=True       
-        # if u.ville and im.description and u.ville in im.description: testdescription=True
-        # if teststate and testpriceMax and (testville or testzone or testdescription):
-        u.SendEmail(id)
+        if u.state and im.state and u.state==im.state: teststate=True
+        if u.priceMin and im.price and u.priceMin<=im.price:testpriceMin=True
+        if u.priceMax and im.price and u.priceMax>=im.price:testpriceMax=True
+        if u.surfaceMin and im.surfaceTotale and u.surfaceMin<=im.surfaceTotale:testsurfeMin=True
+        if u.surfaceMax and im.surfaceTotale and u.surfaceMax>=im.surfaceTotale:testsurfeMax=True
+        if u.ville and im.ville and u.ville==im.ville:testville=True        
+        if u.ville and im.zone and u.zone==im.zone:zone=True       
+        if u.ville and im.description and u.ville in im.description: testdescription=True
+        if teststate and testpriceMax and (testville or testzone or testdescription):
+         u.SendEmail(id)
         
        
 

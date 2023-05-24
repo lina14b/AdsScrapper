@@ -1,65 +1,193 @@
+{% load static %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
    <head>
-      <!-- basic -->
-      <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <!-- mobile metas -->
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-      <!-- site metas -->
-      <title>Vente Imm</title>
-      <meta name="keywords" content="">
-      <meta name="description" content="">
-      <meta name="author" content="">
-      <!-- bootstrap css -->
-      <link rel="stylesheet" href="css/bootstrap.min.css">
-      <!-- style css -->
-      <link rel="stylesheet" href="css/style.css">
-      <!-- Responsive-->
-      <link rel="stylesheet" href="css/responsive.css">
-      <!-- fevicon -->
-      <link rel="icon" href="images/fevicon.png" type="image/gif" />
-      <!-- Scrollbar Custom CSS -->
-      <link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css">
-      <!-- Tweaks for older IEs-->
-      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-      <!-- owl stylesheets --> 
-      <link rel="stylesheet" href="css/owl.carousel.min.css">
-      <link rel="stylesheet" href="css/owl.theme.default.min.css">
+      <title>Statistique</title>
+      <link rel="icon" href="{% static 'logo.png' %}" type="image/png">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+      <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+      <link rel="stylesheet" href="{% static 'style.css' %}">
+      <link rel="stylesheet" href="{% static 'index.css' %}">
+    
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
-   </head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> 
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+      <style>
+        input[type="submit"].Rechercher {
+          /* Default styles */
+          background-color: black;
+          padding: 10px 20px;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.3s ease;
+        }
+    
+        input[type="submit"].Rechercher:hover {
+          /* Hover styles */
+          transform: scale(1.05);
+        }
+        a { transition: transform 0.3s ease;
+          }
+
+          a:hover {
+            transform: scale(1.05); /* Increased font size on hover */
+          }
+          .profile{font-size:20px; color:white
+
+
+          }
+          i:hover{font-size:25px;
+
+          }
+          .fas.fa-chevron-up:hover
+          {background-color: rgb(165, 165, 165);
+          }
+          .fas.fa-chevron-down:hover
+          {background-color: rgb(165, 165, 165);
+          }
+          .input-group {
+                display: flex;
+                gap: 10px;
+              }
+
+              .form-group {
+                margin-bottom: 10px;
+              }
+
+              .price {
+                display: inline-block;
+                width: 60px;
+              }
+              .btn.btn-primary
+              {transition: transform 0.3s ease;}
+              .btn.btn-primary:hover
+              { transform: scale(1.05);}
+          
+              .fixed-image {
+                     height: 100%;
+                     width: 500px; 
+                     object-fit: fill; /* Maintain aspect ratio and fill the container */
+                     }
+
+
+                     /********************/
+                
+      .prev,
+      .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        padding: 16px;
+        margin-top: -22px;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        transition: 0.6s ease;
+        border-radius: 0 3px 3px 0;
+        user-select: none;
+      }
+      /* Position the "next button" to the right */
+      .next {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+      }
+      /* On hover, add a black background color with a little bit see-through */
+      .prev:hover,
+      .next:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+      } 
+      
+      /******************************/
+      
+        /* CSS for the slideshow */
+        .slideshow-container {
+            position: relative;
+            max-width: 1000px;
+            margin: auto;
+            height: 400px;
+        }
+
+        .mySlides {
+            display: none;
+        }
+
+        .slideshow-container img {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* CSS for the dots */
+        .dot {
+            height: 15px;
+            width: 15px;
+            margin: 0 2px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 1s ease;
+        }
+
+        .active {
+            background-color: #717171;
+        }
+    </style>
+
+      
+    
+    </head>
    <body>
-      <!-- header section start -->
-      <div class="header_section">
-         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container">
-               <a class="logo" href="index.html"><img src="images/ll.jpg"></a>
-               <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-               <span class="navbar-toggler-icon"></span>
-               </button>
-               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.html" Détails</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="design.html">Notre conception</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contactez nous</a>
-                    </li>
-                    
-                  </ul>
+      
+         <div class="">
+          <nav class="navbar-expand-lg"  style="background-color: black; height: 100px; padding-top: 0;">
+                           <div class="container" style="background-color: black; " >
+                            <a class="logo" href="{% url 'home' %}"><img src="{% static 'logo.png' %}" style="height: 50px;margin-top: 10px; margin-left:0px; margin-right:10px;width: 50px;"></a>
+                           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                              <span class="navbar-toggler-icon"></span>
+                              </button>
+                           <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                    <ul class="navbar-nav mr-auto">
+                                       <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
+                                       <li class="nav-item"><a class="nav-link" href="{%url 'stats' %}" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
+                                    </ul>
+                           
+                                    <ul style="margin-top: 20px; margin-right:0px ;">
+                                    <li>
+                                       {% if request.user.is_authenticated %}
+                                       <a class="profile" href="{% url 'profile' %}"style="font-size:20px; color:white">{{ request.user.username }} <i class="fas fa-user"></i></a>
+                                       {% else %}
+                                       <a class="profile" href="{% url 'login_user' %}"style="font-size:20px; color:white"><i class="fas fa-user"></i></a>
+                                       {% endif %}
+                                    </li>
+                                    </ul>
+                           
+                           </div>    
+          </nav>
+       </div>
+       
+ 
+       <br>
+   
+     
+      
+         <div class="container" >
+ 
+                   <iframe title="Report Section" width="1000" height="700" src="https://app.powerbi.com/view?r=eyJrIjoiNjk2MzdkNzQtODIxYy00MjI3LTk0ZjgtNDMwMGEzZGVjZWUwIiwidCI6ImEyZDgzMzZlLWEyOTktNGQ1Mi04NjM2LWI3ZWY4YzExN2ExZCIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe>
+                
                  
-               </div>
-         </nav>
+          
+                 
+                   
+                
+                
+                  
+             <br><br>
          </div>
-      </div>
+      
+
    </body>
-</html> 
+  
+</html>

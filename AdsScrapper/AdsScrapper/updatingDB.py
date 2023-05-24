@@ -33,3 +33,33 @@ print("deleted dups:",deletedups)
 #######Delete date annonce > 3mois
 Deleteitems=b.Delete_6months()
 print("old items Deleted: ",Deleteitems)
+
+
+import datetime
+
+now = datetime.datetime.now()
+
+from loadDW import LoadDW
+from pymongo import MongoClient
+
+if now.weekday() == 0 and now.hour < 12:
+    print("______________")
+    l=LoadDW()
+    print("______________")
+    l.createDB()
+    print("______________")
+    l.createTables()
+    print("______________")
+    l.LoadDimType()
+    print("______________")
+    l.LoadDimLocation()
+    print("______________")
+    l.LoadDimTime()
+    print("______________")
+    l.loadFact()
+
+    client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
+    db = client["AdsScrappers"]
+    collection = db["AdsHistorisation"]
+
+    collection.drop()

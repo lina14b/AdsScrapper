@@ -88,7 +88,7 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                   <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
-                  <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{%url 'stats' %}" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
                 </ul>            
                 <ul style="margin-top: 20px; margin-right:0px ;">
                  <li>
@@ -126,9 +126,19 @@
             <input type="number" name="max_price" id="max_price" class="form-control" placeholder="Max"style="width: 150px;">
           </div>
          <div class="input-group" style="margin-top: 10px;">
-        <select name="state" class="form-control" required>
+        <select name="state" id="state" class="form-control" required>
           <option disabled selected value> --State-- </option>
           {% for item in state %}
+            <option value="{{item}}">{{item}}</option>
+          {% endfor %}
+        </select>
+        <select name="ville" id="ville" class="form-control">
+          <option disabled selected value> --Ville-- </option>
+         
+        </select>
+        <select name="typeB" class="form-control">
+          <option disabled selected value> --Bien-- </option>
+          {% for item in typeB %}
             <option value="{{item}}">{{item}}</option>
           {% endfor %}
         </select>
@@ -158,7 +168,7 @@
                             <div class="carousel-item active" >
                                       <div class="container">
                                               <div class="design_section_2" >
-                                                
+                                                <span>{{search}}{{msg}}</span>
                                                                             <form method="GET" action="{% url 'sort' %}" style="margin-right: -65em;">
                                                                     
                                                                               <span class="price">Prix</span>
@@ -242,7 +252,29 @@
       
       
       
+ <script>
+  const stateSelect = document.getElementById("state");
+  const villeSelect = document.getElementById("ville");
 
+  const villelist = JSON.parse('{{ ville|escapejs }}');
+  console.log(villelist)
+  stateSelect.addEventListener("change", handleStateChange);
+
+  function handleStateChange() {
+    const selectedState = stateSelect.value;
+
+    villeSelect.innerHTML = '<option disabled selected value> --Ville-- </option>';
+
+    const filteredVilleList = villelist.filter(item => item.state === selectedState);
+
+    filteredVilleList.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.ville;
+      option.textContent = item.ville;
+      villeSelect.appendChild(option);
+    });
+  }
+</script>
 
 
 

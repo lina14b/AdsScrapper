@@ -64,7 +64,7 @@
                          <div class="collapse navbar-collapse" id="navbarSupportedContent">
                                   <ul class="navbar-nav mr-auto">
                                      <li class="nav-item"><a class="nav-link" href="{% url 'home' %}" style=" margin-top: 20px;margin-left:-20em;margin-right:10px;width: 150px;">Home</a></li>
-                                     <li class="nav-item"><a class="nav-link" href="about.html" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
+                                     <li class="nav-item"><a class="nav-link" href="{%url 'stats' %}" style="margin-top: 20px;margin-left:-10em;margin-right:10px;width: 150px;">Stats</a></li>
                                   </ul>
                          
                                   <ul style="margin-top: 20px; margin-right:0px ;">
@@ -121,16 +121,30 @@
                                   &nbsp; <input type="number"{% if user.surfaceMax %} value="{{user.surfaceMax}}" {% endif %}  name="max_surf" id="max_surf" class="form-control" placeholder="Max"style="width: 100px;">
                                 </div>
                           <br>
-                                <div class="input-group" style="margin-top: 10px;">
-                                  <span for="min_price" class="price" style="font-size:15px; margin-top: 10px; width: 50px;">Ville:</span>
-                                  &nbsp; <input type="text" {% if user.ville %} value="{{user.ville}}" {% endif %} name="ville" id="ville" class="form-control" placeholder="Max"style="width: 100px;">
-                                </div>
+                                
                                 <div class="input-group" style="margin-top: 10px;">
                                   <select name="state" class="form-control" required>
                                     <option disabled selected value> --State-- </option>
                                   
                                     {% for item in state %}
                                       <option value="{{ item }}" {% if user.state and item.lower == user.state.lower %} selected {% endif %}>{{ item }}</option>
+                                    {% endfor %}
+                                  </select>
+                                  <select name="ville" class="form-control" required>
+                                    <option disabled selected value> --ville-- </option>
+                                  
+                                    {% for item in ville %}
+                                      <option value="{{ item.ville }}" {% if user.ville and item.ville.lower == user.ville.lower %} selected {% endif %}>{% if user.ville and user.state and item.state.lower == user.state.lower %} {{ item.ville }}{% endif %}</option>
+                                    {% endfor %}
+                                  </select>
+                                  
+                                </div>
+                                <div class="input-group" style="margin-top: 10px;">
+                                  <select name="typeb" class="form-control" required>
+                                    <option disabled selected value> --Type Bien-- </option>
+                                  
+                                    {% for item in typeB %}
+                                      <option value="{{ item }}" {% if user.typeb and item.lower == user.typeb.lower %} selected {% endif %}>{{ item }}</option>
                                     {% endfor %}
                                   </select>
                                   

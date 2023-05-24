@@ -46,7 +46,8 @@ class TransformationTexte (BaseEstimator, TransformerMixin):
         self.cv = CountVectorizer()
    
     def fit(self, X, y=None):
-         descriptions = [' '.join(ad['TotalDescp']) for ad in X]
+         descriptions=""
+         descriptions = [' '.join(ad['TotalDescp']) if ad['TotalDescp'] is not None else '' for ad in X]
          vectors = self.cv.fit_transform(descriptions)
          return vectors
       

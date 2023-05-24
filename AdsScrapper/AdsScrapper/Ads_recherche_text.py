@@ -8,7 +8,7 @@ class Recherche:
     def __init__(self):
         b=BienImmobilier()
         self.data = b.readAll()
-        self.list2=self.data[1:1000]
+        self.list2=self.data
         self.t=TransformationTexte()
         self.vectors=self.t.fit(self.list2)
 
@@ -24,7 +24,7 @@ class Recherche:
         df = pd.DataFrame(self.list2)
         df['distances']=flat_list
         df_sorted = df.sort_values('distances', ascending=True)
-        return df_sorted.values.tolist()
+        return df_sorted.to_dict(orient='records')
     
     # def search_price(self, min_price, max_price):
     #     return [d for d in self.data if min_price <= d['price'] <= max_price]

@@ -2,14 +2,15 @@ import re
 from datetime import datetime
 from pymongo import MongoClient
 import pymongo
-
+import unicodedata
+from unidecode import unidecode
 from datetime import datetime, timedelta
 from transformationText import TransformationTexte
 from geopy.geocoders import GeoNames
 from geopy.exc import GeocoderUnavailable
 import time
 from bson import ObjectId
-
+import pandas as pd
 
 class BienImmobilier:
     client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
@@ -43,31 +44,23 @@ class BienImmobilier:
         self.anneeconstruction = None
         self.TotalDescp=None
         self.tokens=[]
-        
-        
+        self.type=None       
    
-    def extractRemax(self,row):
-        print("\nhere")
+    def extractRemax(self,row):      
         self.website = "remax.com.tn"
-
         self.url = row['url']
-
         row['Code']=row['Code'].replace(" ", "")
         if row['Code']:
-         self.code=int(row['Code'], 10)
-        
+         self.code=int(row['Code'], 10)      
         if row['description']:
           text=re.sub(r'\\u[a-fA-F0-9]{4}', '', row['description'])
           decoded_text = text.replace(r"\n", "") 
           self.description=decoded_text
-
         if row['price']:
          number = int(re.sub(r"\D", "", row['price']))
          if number<1000:
           number=number*1000  
-         self.price=number
-        
-
+         self.price=number        
         if row['surface']:
           numeric_only = re.sub(r'[^\d]', '', row['surface']) 
           self.surfaceTotale = numeric_only
@@ -108,8 +101,7 @@ class BienImmobilier:
         self.dateinstered = self.datescraped
         self.verifyLocation()   
         self.total_description()      
-        self.imagesurlslist = row['image_urls']      
-       
+        self.imagesurlslist = row['image_urls']         
    
     def extractTunisieVente(self,row):
     #Url
@@ -417,7 +409,6 @@ class BienImmobilier:
 
      self.total_description()
 
-
     def extractTayara(self,row):
         
         self.website = "tayara.tn"
@@ -462,8 +453,7 @@ class BienImmobilier:
         self.verifyLocation() 
         self.total_description()      
         self.imagesurlslist = row['image_urls']  
-
-    
+   
     def extractFB(self,row):
         
         self.website = "facebook.com"
@@ -504,13 +494,13 @@ class BienImmobilier:
         self.verifyLocation()
         self.total_description()      
         self.imagesurlslist = row['image_urls']  
-
-    
+  
     def get_state(self,city, country):
      time.sleep(4)
      try:
         geolocator = GeoNames(username="linab14")
         location = geolocator.geocode(f"{city}, {country}", exactly_one=True)
+        # print(location)
         if location is not None:
             state = location.raw.get('adminName1')
             state = state.replace(" Governorate", "")
@@ -534,6 +524,7 @@ class BienImmobilier:
       if "Hammamet" in self.ville: self.state="Nabeul"
 
      if self.state:
+       print(self.state,self.state in states_of_tunisia)
        if "Manouba" in self.state: self.state="Manouba"
        if "Kef" in self.state: self.state="Kef"
        if "Gab" in self.state: self.state="Gabes"
@@ -610,11 +601,52 @@ class BienImmobilier:
      
      return getstate
     
+    def verifytype(self):
+      
+        if self.description:
+          des=self.description.lower()
+          lien= self.url.lower()
+          des = des.replace("é", "e")
+          des = des.replace("ô", "o")
+          des = des.replace("è", "e")
+          des = des.replace("à", "a")
+          des = des.replace("â", "a")
+
+          normal_text = ''.join(c for c in unicodedata.normalize('NFKD', des) if not unicodedata.combining(c))
+
+          des = normal_text
+
+
+          if "dar" in des or "maison" in des or "dar" in lien or "maison" in lien or "دار" in des or "دار" in lien or "منزل" in des or "منزل" in lien  or "ديار" in des :
+            type="Maison"
+          
+          elif "villa" in des or "villa" in des or "villa" in lien  or "villa" in lien or "فيلا" in des or "فيلا" in lien:
+            type="Villa"
+          
+          elif "epot" in des or "depot" in des or "dépôt" in des or "dépôt" in des or "depot" in lien  or "dépôt" in lien or "مستودع" in des or "مستودع" in lien:
+            type="Dépôt"
+          elif "commerc"in des or "fond" in des or "fond de commerce" in des or "fond de commerce" in des or "commerce" in des  or "commercial" in des or "صل التجاري" in des or "صل التجاري" in lien or "معمل" in des or "محل" in des or "usine" in des  or "حانوت" in des:
+            type="Commercial"
+          elif "sidence"in des   or "penthouse" in des or "habité" in des or "etage" in des or "étage" in des or "chambre"  in des or "s+" in des or "s+" in des or "triplex" in des or "triplex" in lien or "duplex" in des or "برتمان" in des or "appretemnt" in des   or "duplex" in lien or  "apprt" in des or "appartement" in des or "apprt" in lien  or "appartement" in lien or "برطمان" in des or "برطمان" in lien or "شقة" in des or "شقة" in lien  or "appart" in des or "appart" in lien or " r+"in des or "s +" in des or "s plus"in des:
+            type="Appartement"
+          elif "terrain" in des or "terrain" in des or "terrain" in lien  or "terrain" in lien  or "مساح" in des or  "hect" in des or "هكتار" in des or "ارض" in des or "ارض" in lien or "أرض" in des or "أرض" in lien or " terr" in des or " lot " in des : 
+            type="Terrain"
+          elif "bureau" in des or "bureau" in des or "bureau" in lien  or "bureau" in lien or "مكتب" in des or "مكتب" in lien:
+            type="Bureau"
+
+          elif "demenagement" in des or "a vendre des" in des:pass
+
+          elif "garrage" in des or  "local" in des or "locaux" in des or  "hotel"in des   or "m2" in des or "local" in des  or "chateau" in des or "عمارة"  in des or "جنان"  in des or "ferme" in des  or "studio" in des or "سانية" in des or "senia" in des or "immeuble" in des or "s1" in des or "s2" in des or "s3" in des :
+            type="Autre"
+          self.type=type
+
+
     
     def print_maison(self):
         print("Website:", self.website)
         print("URL:", self.url)
         print("Code:", self.code)
+        print("type:", self.type)
         print("Description:", self.description)
         print("Price:", self.price)
         print("Total Surface:", self.surfaceTotale)
@@ -751,12 +783,6 @@ class BienImmobilier:
     def SaveDb(self,BI):
       from user import User
       u=User()
-
-     # Set up a MongoDB client to connect to your Atlas cluster
-      # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
-      # # Access a database and a collection
-      # db = client["AdsScrappers"]
-      # collection = db["Ads"]
       text=" "
       newdescription=" "
       t=TransformationTexte()
@@ -786,12 +812,12 @@ class BienImmobilier:
       if test==1:
        self.TotalDescp=text
 
-
+      BI.verifytype()
       property_dict = BI.__dict__
       filtered_dict = {k: v for k, v in property_dict.items() if v is not None}
       result = self.collection.insert_one(filtered_dict)
       inserted_id = str(result.inserted_id)
-      print("Inserted document ID:", inserted_id)
+      print("Inserted document ID:", inserted_id,BI.type)
       
       u.Notify(BI,inserted_id)
       
@@ -799,14 +825,16 @@ class BienImmobilier:
       self.SaveDb_Historisation()
     
     def SaveDb_Historisation(self):
-      if self.price and self.dateinstered and self.country and self.surfaceTotale and self.ville:
+      if self.price and self.dateinstered and self.country and self.surfaceTotale and self.ville and self.state:
         BI=BienImmobilier()
         BI.code=self.code
         BI.price=self.price
         BI.dateinstered=self.dateinstered
         BI.country=self.country
         BI.ville=self.ville
+        BI.state=self.state
         BI.surfaceTotale=self.surfaceTotale
+        BI.type=self.type
         BI.characteristicslist=None
         BI.imagesurlslist=None
         # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
@@ -834,6 +862,9 @@ class BienImmobilier:
 
             if 'description'in result:
              self.description = result['description']
+
+            if 'type'in result:
+             self.type = result['type']
 
             if 'price'in result:
              self.price = result['price']
@@ -915,7 +946,10 @@ class BienImmobilier:
 
             if '_id' in result:
              self.code = result['_id']
-
+            
+            if 'type'in result:
+             self.type = result['type']
+            
             if 'description'in result:
              self.description = result['description']
 
@@ -988,12 +1022,13 @@ class BienImmobilier:
         # client = MongoClient("mongodb+srv://lina:lina@cluster0.st42f.mongodb.net/test")
         # db = client["AdsScrappers"]
         # collection = db["Ads"]
-        cursor = self.collection.find({})
+        cursor = self.collection.find({})#.limit(1000)
         # cursor = self.collection.find().sort('datescraped', pymongo.DESCENDING).limit(14500)
 
 
         datas = list(cursor)
         ListAll=[]
+        i=0
 
 
         for result in datas:
@@ -1005,6 +1040,11 @@ class BienImmobilier:
              BI.url = result['url']
             if '_id'in result:
              BI.code = result['_id']
+            # if 'code'in result:
+            #  BI.code = result['code']
+            if 'type'in result:
+            #  print('type')
+             BI.type = result['type']
             if 'description'in result:
              BI.description = result['description']
             if 'price'in result:
@@ -1050,7 +1090,13 @@ class BienImmobilier:
             if 'total_description'in result:
              BI.TotalDescp=result['total_description']
             ListAll.append(BI.__dict__)
-        sorted_data = sorted(ListAll, key=lambda x: x['datescraped'])
+            if i==0:
+              print(BI.__dict__)
+              i+=1
+
+             
+        sorted_data = sorted(ListAll, key=lambda x: x['datescraped'], reverse=True)
+      
 
         return sorted_data 
     
@@ -1228,3 +1274,58 @@ class BienImmobilier:
       num_documents = self.collection.count_documents({})
       return num_documents
     
+    def sortdate(self,data,type):
+      df = pd.DataFrame(data)
+      
+      if type=="up":
+          
+          df= df.sort_values(by='datescraped', ascending=True, na_position='last')
+      else :
+         
+          df= df.sort_values(by='datescraped', ascending=False, na_position='last')
+
+      sortedlist = df.to_dict(orient='records')
+      return sortedlist
+    
+    def sortprice(self,data,type):
+      df = pd.DataFrame(data)
+      threshold = 10000
+      if type=="up":
+          df = df[df['price'] >= threshold]
+          df= df.sort_values(by='price', ascending=True, na_position='last')
+      else :
+          df = df[df['price'] >= threshold]
+          df= df.sort_values(by='price', ascending=False, na_position='last')
+      sortedlist = df.to_dict(orient='records')
+      return sortedlist
+
+    def filterdata(self,mydata,ville,state,pricemin,pricemax,typeBien):
+      print(len(mydata))
+      df = pd.DataFrame(mydata)
+      if state:
+        df = df[df['state'] == state]
+        print("1",len(df))
+      if ville:
+        df = df[df['ville'] == ville]
+        print("2",len(df))
+      if typeBien:
+        df = df[df['type'] == typeBien]
+        print("3",len(df))
+      if pricemin:
+        df = df[df['price'] >= int(pricemin)]
+        print("5",len(df))
+      if pricemax:
+        df = df[df['price'] <= int(pricemax)]
+        print("6",len(df))
+      filtereddata = df.to_dict(orient='records')
+      print(len(filtereddata))
+      return filtereddata
+    
+    def getvilles(self,data):
+      df = pd.DataFrame(data)
+      dfLocation=df[['state', 'ville']]
+      subset_columns = ['state', 'ville']
+      distinct_values = dfLocation.drop_duplicates(subset=subset_columns)
+      distinct_values = distinct_values.dropna()
+      distinct_values = distinct_values.to_dict(orient='records')
+      return distinct_values
